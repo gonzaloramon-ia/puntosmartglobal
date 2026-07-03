@@ -1,0 +1,48 @@
+<!doctype html><html lang="es-AR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#020713"><title>Punto Smart OS Plus | Backup y sincronización</title><meta name="description" content="Punto Smart OS Plus guarda tu escritorio online en tu nube privada para recuperarlo desde cualquier dispositivo. 15 días gratis sin tarjeta, luego USD 3.99/mes."><link rel="icon" type="image/png" href="../favicon.png"><link rel="stylesheet" href="../site.css"></head><body><div class="wrap"><header class="top"><a class="brand" href="../" aria-label="Punto Smart OS"><span class="mark"></span><span><span>PUNTO</span><strong>SMART OS</strong></span></a><nav class="nav" aria-label="Navegación"><a href="../">Free</a><a href="../instructivo/">Cómo usarlo</a><a href="../plus/" class="active">Plus</a><a href="../global/">Global</a><a href="../privacidad/">Privacidad</a></nav></header>
+<main>
+  <section class="hero">
+    <article class="hero-card">
+      <span class="eyebrow">Punto Smart OS Plus</span>
+      <h1>Tu escritorio online, siempre listo.</h1>
+      <p>Plus guarda tu entorno en tu nube privada para que puedas recuperarlo desde cualquier celular, PC, tablet o Smart TV.</p>
+      <p>Si se rompe tu equipo, perdés el celular o usás una computadora prestada, entrás a Punto Smart OS y tenés tus accesos listos para trabajar.</p>
+      <div class="cta"><a class="btn primary" href="app/">Probar Plus gratis 15 días</a><a class="btn warn" href="#precio">USD 3.99/mes después</a></div>
+      <p class="note">La versión Free sigue funcionando sin registro. Plus suma backup, sincronización y recuperación del entorno.</p>
+    </article>
+    <aside class="preview">
+      <div class="mini"><span class="pill">Ventaja central</span><b>Tu entorno viaja con vos</b><small>Accesos, orden, categorías, iconos y preferencias recuperables desde otro dispositivo.</small></div>
+      <div class="mini"><span class="pill">Privacidad</span><b>Guardado en tu nube</b><small>La configuración Plus se guarda en tu propio Google Drive. Punto Smart OS no necesita guardar contraseñas de tus apps externas.</small></div>
+      <div class="mini"><span class="pill">Liviano</span><b>No depende de un equipo potente</b><small>Funciona desde la web. Ideal para celulares, PCs viejas, tablets, Smart TVs o equipos prestados.</small></div>
+    </aside>
+  </section>
+  <section class="section"><h2>Por qué conviene Plus</h2><div class="cards three">
+    <article class="card"><h3>Recuperación rápida</h3><p>Perdés o cambiás el dispositivo y recuperás tu escritorio sin volver a cargar todo desde cero.</p></article>
+    <article class="card"><h3>Trabajo continuo</h3><p>Entrás desde cualquier equipo y seguís con tus accesos importantes ya ordenados.</p></article>
+    <article class="card"><h3>Sin instalación pesada</h3><p>No bajás programas. Abrís Punto Smart OS desde el navegador y usás tu entorno.</p></article>
+    <article class="card"><h3>Uso en equipo prestado</h3><p>Podés abrir tu escritorio en el celular o PC de otra persona sin desconfigurarle sus apps.</p></article>
+    <article class="card"><h3>Perfiles futuros</h3><p>Personal, comercio, técnico u oficina. Cada perfil con sus accesos y prioridades.</p></article>
+    <article class="card"><h3>Backup</h3><p>Tu configuración queda respaldada para no depender de un solo navegador.</p></article>
+  </div></section>
+  <section id="precio" class="section"><h2>Planes</h2><div class="price-grid">
+    <article class="price-card"><span class="pill">Free</span><h3>Gratis</h3><div class="price-tag">USD 0</div><p>Para empezar a usar Punto Smart OS sin fricción.</p><ul><li>Categorías base</li><li>Buscador</li><li>Agregar accesos</li><li>Editar accesos</li><li>Guardado local en el navegador</li></ul><div class="cta"><a class="btn" href="../">Usar Free</a></div></article>
+    <article class="price-card featured"><span class="pill">Precio lanzamiento</span><h3>Plus</h3><div class="price-tag">USD 3.99 / mes</div><p><b class="ok">15 días gratis sin tarjeta.</b> Después pagás solo si querés continuar.</p><ul><li>Guardar entorno en tu nube privada</li><li>Recuperar en otro equipo</li><li>Sincronizar accesos</li><li>Backup</li><li>Perfiles futuros</li></ul><div class="cta"><a class="btn primary" href="app/">Probar Plus gratis 15 días</a><a class="btn" href="../instructivo/">Ver cómo funciona</a></div><p class="note">El valor debe estar visible desde el primer día. Sin cargos sorpresa.</p></article>
+  </div></section>
+  <section class="wide"><div><h2>Avisos de prueba</h2><p class="lead">Durante la prueba se debe avisar con tiempo: quedan 5 días, 3 días, 1 día y prueba finalizada. Si no paga, vuelve a Free sin bloquear la app.</p></div><a class="btn" href="../instructivo/">Cómo funciona</a></section>
+</main>
+<footer class="footer"><div><b>PUNTO SMART OS</b><small>Tu escritorio online, sin instalar nada.</small></div><div class="footer-links"><a href="../">Free</a><a href="../instructivo/">Cómo usarlo</a><a href="../plus/">Plus</a><a href="../privacidad/">Privacidad</a></div><span>© 2026 Punto Smart OS</span></footer></div>
+<script>
+(function(){
+  const params = new URLSearchParams(location.search);
+  const country = (params.get('country') || '').toUpperCase();
+  const isGlobal = country && country !== 'AR';
+  const target = isGlobal ? ('../global-plus/?country=' + encodeURIComponent(country)) : 'app/';
+  document.querySelectorAll('a[href="app/"]').forEach(a => a.href = target);
+  if(isGlobal){
+    document.querySelectorAll('a[href="../"]').forEach(a => a.href = '../global/?country=' + encodeURIComponent(country));
+    const globalNav = document.querySelector('a[href="../global/"]');
+    if(globalNav) globalNav.href = '../global/?country=' + encodeURIComponent(country);
+  }
+  const clock=document.querySelector('#clock');
+  if(clock) setInterval(()=>clock.textContent=new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}),1000);
+})();
+</script></body></html>
