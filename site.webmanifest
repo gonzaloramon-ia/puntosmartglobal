@@ -1,0 +1,15 @@
+{
+  "name": "Punto Smart OS",
+  "short_name": "Smart OS",
+  "description": "Tu escritorio online para organizar apps web, accesos y herramientas.",
+  "lang": "es-AR",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#020713",
+  "theme_color": "#020713",
+  "icons": [
+    {"src": "favicon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+  ]
+}

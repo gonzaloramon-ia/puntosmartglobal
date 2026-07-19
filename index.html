@@ -4,18 +4,60 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#020713" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https:; connect-src https://api.open-meteo.com https://dolarapi.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'" />
   <title>Punto Smart OS Free | Tu escritorio online</title>
   <meta name="description" content="Punto Smart OS es tu escritorio online para usar internet: accesos, apps web, trámites, IA, compras y herramientas en una pantalla rápida, gratis y sin instalar nada." />
+  <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+  <link rel="canonical" href="https://www.puntosmart.com.ar/" />
+  <link rel="alternate" hreflang="es-AR" href="https://www.puntosmart.com.ar/" />
+  <link rel="alternate" hreflang="es-ES" href="https://www.puntosmart.com.ar/es/" />
+  <link rel="alternate" hreflang="es-MX" href="https://www.puntosmart.com.ar/mx/" />
+  <link rel="alternate" hreflang="pt-BR" href="https://www.puntosmart.com.ar/br/" />
+  <link rel="alternate" hreflang="fr-FR" href="https://www.puntosmart.com.ar/fr/" />
+  <link rel="alternate" hreflang="en-US" href="https://www.puntosmart.com.ar/us/" />
+  <link rel="alternate" hreflang="x-default" href="https://www.puntosmart.com.ar/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Punto Smart OS" />
+  <meta property="og:locale" content="es_AR" />
+  <meta property="og:title" content="Punto Smart OS Free | Tu escritorio online" />
+  <meta property="og:description" content="Organizá apps web, accesos, trámites, IA y herramientas en una sola pantalla, gratis y sin instalar nada." />
+  <meta property="og:url" content="https://www.puntosmart.com.ar/" />
+  <meta property="og:image" content="https://www.puntosmart.com.ar/favicon.png" />
+  <meta property="og:image:width" content="512" />
+  <meta property="og:image:height" content="512" />
+  <meta property="og:image:alt" content="Logo de Punto Smart OS" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Punto Smart OS Free | Tu escritorio online" />
+  <meta name="twitter:description" content="Tu escritorio online para organizar internet, gratis y sin instalar nada." />
+  <meta name="twitter:image" content="https://www.puntosmart.com.ar/favicon.png" />
 
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="apple-touch-icon" href="favicon.png" />
+  <link rel="manifest" href="site.webmanifest" />
+  <link rel="preconnect" href="https://api.open-meteo.com" crossorigin />
+  <link rel="preconnect" href="https://dolarapi.com" crossorigin />
+  <link rel="preconnect" href="https://www.google.com" crossorigin />
 
-  <link rel="stylesheet" href="styles.css?v=101" />
-  <link rel="stylesheet" href="smartos-extra.css?v=101" />
-</head>
+  <link rel="stylesheet" href="styles.css?v=180" />
+  <link rel="stylesheet" href="smartos-extra.css?v=180" />
+  <link rel="stylesheet" href="reliability.css?v=5" />
+<!-- Punto Smart OS - desarrollo original de Punto Smart - Punto Smart marca registrada ante INPI --></head>
 <body>
-  <div class="app-shell">
+  <div class="app-shell" itemscope itemtype="https://schema.org/WebApplication">
+    <meta itemprop="name" content="Punto Smart OS Free" />
+    <meta itemprop="url" content="https://www.puntosmart.com.ar/" />
+    <meta itemprop="applicationCategory" content="UtilitiesApplication" />
+    <meta itemprop="operatingSystem" content="Cualquier sistema con navegador web" />
+    <meta itemprop="isAccessibleForFree" content="true" />
+    <span itemprop="offers" itemscope itemtype="https://schema.org/Offer" hidden>
+      <meta itemprop="price" content="0" />
+      <meta itemprop="priceCurrency" content="ARS" />
+    </span>
+    <span itemprop="publisher" itemscope itemtype="https://schema.org/Organization" hidden>
+      <meta itemprop="name" content="Punto Smart" />
+      <meta itemprop="url" content="https://www.puntosmart.com.ar/" />
+    </span>
     <header class="topbar">
       <a class="brand" href="#" aria-label="Punto Smart OS">
         <span class="brand-mark"></span>
@@ -27,14 +69,14 @@
           <span class="status-icon">◷</span>
           <span><b id="clock">--:--</b><small id="dateText">Cargando...</small></span>
         </div>
-        <a class="status-pill hide-small" data-open="https://www.google.com/search?q=clima+buenos+aires" href="https://www.google.com/search?q=clima+buenos+aires" target="_blank" rel="noopener">
-          <span class="status-icon weather">☁</span>
-          <span><b>Clima</b><small>Buenos Aires</small></span>
-        </a>
-        <a class="status-pill dolar" href="https://dolarhoy.com/" target="_blank" rel="noopener">
+        <button class="status-pill hide-small live-status weather-live" id="weatherWidget" type="button" title="Tocá para usar tu ubicación" aria-live="polite">
+          <span class="status-icon weather" id="weatherIcon">☁</span>
+          <span class="live-status-copy"><b id="weatherTemp">Clima --°</b><small id="weatherDetail">Buenos Aires · Cargando…</small></span>
+        </button>
+        <button class="status-pill dolar live-status dollar-live" id="dollarWidget" type="button" title="Tocá para actualizar las cotizaciones" aria-live="polite">
           <span class="dolar-logo">$</span>
-          <span><b>Dólar Hoy</b></span>
-        </a>
+          <span class="live-status-copy"><b id="dollarOfficial">Oficial --</b><small id="dollarBlue">Blue -- · Cargando…</small></span>
+        </button>
         <div class="status-pill country-global-pill">
           <span class="status-icon">🌎</span>
           <span><b>País</b><small><select id="localCountrySelect" class="country-select" aria-label="Cambiar país">
@@ -51,12 +93,14 @@
           <span><b>Plus</b><small id="plusCtaShort">Conocé ventajas</small></span>
           <span class="plus-dot"></span>
         </button>
-        <button class="gear" id="resetBtn" title="Restaurar orden y accesos">⚙</button>
+        <button class="gear" id="resetBtn" type="button" title="Restaurar orden y accesos" aria-label="Restaurar orden y accesos">↺ <span class="reset-label">Restaurar</span></button>
       </div>
     </header>
 
     <main>
-      <section class="os-slogan" aria-label="Descripción de Punto Smart OS">Interfaz Híbrida Operativa. Entorno Adaptable a tu gusto.</section>
+      <h1 class="os-slogan os-slogan-v18">
+        La nueva manera de usar la web. Anticipate al futuro.
+      </h1>
 
       <section class="smart-search" aria-label="Smart OS Browser">
         <div class="smart-search-head">
@@ -164,10 +208,18 @@
     <footer class="footer">
       <div><b>PUNTO SMART OS</b><small>Tu portal. Todo en un lugar.</small></div>
       <button id="editBtn">✎ Editar</button>
-      <button id="supportBtn">? Soporte</button>
+      <button type="button" data-install-app hidden>Instalar app</button>
+      <button id="supportBtn">Soporte</button>
       <a id="guideBtn" class="footer-link-btn" href="instructivo/">Cómo usarlo</a>
       <button id="suggestBtn">☏ Sugerencias</button>
-      <span>© 2026 Punto Smart OS</span>
+      <nav class="locale-links" aria-label="Versiones internacionales">
+        <a href="es/" hreflang="es-ES">España</a>
+        <a href="mx/" hreflang="es-MX">México</a>
+        <a href="br/" hreflang="pt-BR">Brasil</a>
+        <a href="fr/" hreflang="fr-FR">France</a>
+        <a href="us/" hreflang="en-US">USA</a>
+      </nav>
+      <span>© 2026 Punto Smart. Punto Smart® marca registrada. Punto Smart OS™ desarrollo original. <a href="legal/">Legal</a></span>
     </footer>
   </div>
 
@@ -196,7 +248,7 @@
           <li>Ideal para uso personal, comercios, oficinas, vendedores y equipos de trabajo.</li>
         </ul>
         <a id="plusWhatsappBtn" class="plus-whatsapp" href="plus/">Ver ventajas Plus</a>
-        <p class="plus-phone">+54 9 11 5946 8220</p>
+        <p class="plus-phone">2 meses gratis · USD 3,99/mes desde el tercero · sin cobro automático</p>
       </div>
     </div>
   </dialog>
@@ -243,6 +295,7 @@
   </dialog>
 
   <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden />
-  <script src="script.js?v=101"></script>
+  <script src="script.js?v=202"></script>
+  <script src="install.js?v=1"></script>
 </body>
 </html>

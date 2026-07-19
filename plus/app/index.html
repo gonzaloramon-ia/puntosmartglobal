@@ -4,16 +4,21 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#020713" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com; style-src 'self'; img-src 'self' data: https:; connect-src https://api.open-meteo.com https://dolarapi.com https://accounts.google.com https://oauth2.googleapis.com https://www.googleapis.com; frame-src https://accounts.google.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'" />
   <title>Punto Smart OS</title>
+  <meta name="description" content="Aplicación de Punto Smart OS Plus para sincronizar y recuperar la configuración del escritorio online." />
+  <meta name="robots" content="noindex,follow" />
 
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="apple-touch-icon" href="favicon.png" />
+  <link rel="manifest" href="../../site.webmanifest" />
 
-  <link rel="stylesheet" href="styles.css?v=101" />
-  <link rel="stylesheet" href="smartos-extra.css?v=101" />
+  <link rel="stylesheet" href="styles.css?v=180" />
+  <link rel="stylesheet" href="smartos-extra.css?v=180" />
+  <link rel="stylesheet" href="../../reliability.css?v=5" />
   <link rel="stylesheet" href="plus.css?v=99" />
-</head>
+<!-- Punto Smart OS - desarrollo original de Punto Smart - Punto Smart marca registrada ante INPI --></head>
 <body>
   <div class="app-shell">
     <header class="topbar">
@@ -27,20 +32,22 @@
           <span class="status-icon">◷</span>
           <span><b id="clock">--:--</b><small id="dateText">Cargando...</small></span>
         </div>
-        <a class="status-pill hide-small" data-open="https://www.google.com/search?q=clima+buenos+aires" href="https://www.google.com/search?q=clima+buenos+aires" target="_blank" rel="noopener">
-          <span class="status-icon weather">☁</span>
-          <span><b>Clima</b><small>Buenos Aires</small></span>
-        </a>
-        <a class="status-pill dolar" href="https://dolarhoy.com/" target="_blank" rel="noopener">
+        <button class="status-pill hide-small live-status weather-live" id="weatherWidget" type="button" title="Tocá para usar tu ubicación" aria-live="polite">
+          <span class="status-icon weather" id="weatherIcon">☁</span>
+          <span class="live-status-copy"><b id="weatherTemp">Clima --°</b><small id="weatherDetail">Buenos Aires · Cargando…</small></span>
+        </button>
+        <button class="status-pill dolar live-status dollar-live" id="dollarWidget" type="button" title="Tocá para actualizar las cotizaciones" aria-live="polite">
           <span class="dolar-logo">$</span>
-          <span><b>Dólar Hoy</b></span>
-        </a>
-        <button class="gear" id="resetBtn" title="Restaurar orden y accesos">⚙</button>
+          <span class="live-status-copy"><b id="dollarOfficial">Oficial --</b><small id="dollarBlue">Blue -- · Cargando…</small></span>
+        </button>
+        <button class="gear" id="resetBtn" type="button" title="Restaurar orden y accesos" aria-label="Restaurar orden y accesos">↺ <span class="reset-label">Restaurar</span></button>
       </div>
     </header>
 
     <main>
-      <section class="os-slogan" aria-label="Descripción de Punto Smart OS">Interfaz Híbrida Operativa. Entorno Adaptable a tu gusto.</section>
+      <h1 class="os-slogan os-slogan-v18">
+        La nueva manera de usar la web. Anticipate al futuro.
+      </h1>
 
       <section class="smart-search" aria-label="Smart OS Browser">
         <div class="smart-search-head">
@@ -148,9 +155,10 @@
     <footer class="footer">
       <div><b>PUNTO SMART OS</b><small>Tu portal. Todo en un lugar.</small></div>
       <button id="editBtn">✎ Editar</button>
-      <button id="supportBtn">? Soporte</button>
+      <button type="button" data-install-app hidden>Instalar app</button>
+      <button id="supportBtn">Soporte</button>
       <button id="suggestBtn">☏ Sugerencias</button>
-      <span>© 2026 Punto Smart OS</span>
+      <span>© 2026 Punto Smart. Punto Smart® marca registrada. Punto Smart OS™ desarrollo original. <a href="../../legal/">Legal</a></span>
     </footer>
   </div>
 
@@ -196,7 +204,8 @@
   </dialog>
 
   <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden />
-  <script src="script.js?v=101"></script>
+  <script src="script.js?v=202"></script>
+  <script src="../../install.js?v=1"></script>
   <script src="https://accounts.google.com/gsi/client"></script>
   <script src="plus-config.js?v=97"></script>
   <script src="plus-drive.js?v=97"></script>

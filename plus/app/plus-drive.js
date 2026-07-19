@@ -4,12 +4,15 @@
 (function(){
   const cfg = window.PS_PLUS_CONFIG || {};
   const CLIENT_ID = cfg.GOOGLE_CLIENT_ID || "";
-  const FILE_NAME = cfg.DRIVE_FILE_NAME || "puntosmart-config.json";
+  const COUNTRY = (window.PS_GLOBAL_COUNTRY || "AR").toUpperCase();
+  const keys = window.PS_STORAGE_KEYS || {};
+  const FILE_NAME = cfg.DRIVE_FILE_NAME || `puntosmart-config-${COUNTRY.toLowerCase()}-v2.json`;
   const SCOPE = cfg.DRIVE_SCOPE || "https://www.googleapis.com/auth/drive.appdata";
-  const LS_FILE_ID = "ps_plus_drive_file_id";
-  const LS_LAST_SYNC = "ps_plus_last_sync";
-  const LS_GROUPS = "ps_groups_state";
-  const LS_CONNECTED = "ps_plus_connected";
+  const LS_FILE_ID = keys.fileId || "ps_plus_drive_file_id";
+  const LS_LAST_SYNC = keys.lastSync || "ps_plus_last_sync";
+  const LS_GROUPS = keys.groups || "ps_groups_state";
+  const LS_CONNECTED = keys.connected || "ps_plus_connected";
+  const LS_CUSTOM_TILES = keys.custom || "ps_custom_tiles";
   const DRIVE_WEB_URL = "https://drive.google.com/drive/my-drive";
 
   let tokenClient = null;
@@ -26,10 +29,11 @@
   ready(initPlus);
 
   function initPlus(){
+    const wasConnected = !!localStorage.getItem(LS_CONNECTED);
     injectUI();
-    restoreLocalGroups();
+    localStorage.removeItem(LS_CONNECTED);
     patchCoreSaves();
-    refreshPlusUI();
+    refreshPlusUI(wasConnected ? "Reconectá Drive para continuar sincronizando." : "Plus sin conectar.", wasConnected ? "warn" : "");
   }
 
   function injectUI(){
@@ -62,9 +66,12 @@
           <div class="plus-actions">
             <button id="saveDriveBtn">Guardar en Drive</button>
             <button id="loadDriveBtn">Cargar desde Drive</button>
+            <button id="exportConfigBtn">Exportar respaldo</button>
+            <button id="importConfigBtn">Importar respaldo</button>
             <button id="openDriveBtn">Abrir mi Google Drive</button>
             <button class="danger" id="disconnectDriveBtn">Desconectar</button>
           </div>
+          <input id="plusImportInput" type="file" accept="application/json,.json" hidden>
           <small>Se guarda configuración: accesos, orden, categorías, iconos y preferencias. No se guardan claves ni datos bancarios.</small>
         </div>`;
       document.body.appendChild(dialog);
@@ -73,6 +80,9 @@
       connectDriveBtn.onclick = connectDrive;
       saveDriveBtn.onclick = () => requireToken().then(saveNow).catch(showError);
       loadDriveBtn.onclick = () => requireToken().then(loadFromDrive).catch(showError);
+      exportConfigBtn.onclick = exportJson;
+      importConfigBtn.onclick = () => plusImportInput.click();
+      plusImportInput.onchange = importJson;
       openDriveBtn.onclick = () => window.open(DRIVE_WEB_URL,"_blank","noopener");
       disconnectDriveBtn.onclick = disconnectDrive;
     }
@@ -114,25 +124,18 @@
       queueCloudSave();
     });
 
-    const reset = document.getElementById("resetBtn");
-    if(reset){
-      const originalReset = reset.onclick;
-      reset.onclick = function(){
-        localStorage.removeItem(LS_GROUPS);
-        if(originalReset) originalReset.call(this);
-      };
-    }
   }
 
   function cleanItem(item){
+    const name = String(item?.name || "Acceso").trim().slice(0,80) || "Acceso";
     return {
-      id: item.id || slugSafe(item.name || "acceso"),
-      name: item.name || "Acceso",
-      url: item.url || "#",
-      domain: item.domain || "",
+      id: String(item?.id || slugSafe(name)).replace(/[^a-z0-9:_-]/gi,"").slice(0,120),
+      name,
+      url: typeof normalizeUrl === "function" ? normalizeUrl(item?.url || "#") : "#",
+      domain: String(item?.domain || "").replace(/[^a-z0-9.-]/gi,"").slice(0,120),
       dark: !!item.dark,
-      fallback: item.fallback || "",
-      icon: item.icon || ""
+      fallback: String(item?.fallback || "").slice(0,12),
+      icon: typeof safeIconUrl === "function" ? safeIconUrl(item?.icon || "") : ""
     };
   }
 
@@ -142,10 +145,11 @@
       Object.keys(groups).forEach(k => outGroups[k] = (groups[k] || []).map(cleanItem));
     }
     let custom = [];
-    try{ custom = JSON.parse(localStorage.getItem("ps_custom_tiles") || "[]"); }catch(e){}
+    try{ custom = JSON.parse(localStorage.getItem(LS_CUSTOM_TILES) || "[]"); }catch(e){}
     return {
       product: "Punto Smart OS Plus",
-      version: 1,
+      version: 2,
+      country: COUNTRY,
       updatedAt: new Date().toISOString(),
       groups: outGroups,
       custom: Array.isArray(custom) ? custom : []
@@ -153,20 +157,25 @@
   }
 
   function applyConfig(data){
-    if(!data || typeof data !== "object") return;
+    validateConfig(data);
 
     if(data.groups && typeof groups === "object"){
-      Object.keys(data.groups).forEach(k => {
+      Object.keys(groups).forEach(k => {
         if(Array.isArray(data.groups[k]) && Array.isArray(groups[k])){
           groups[k].length = 0;
-          data.groups[k].forEach(item => groups[k].push(cleanItem(item)));
+          data.groups[k].slice(0,100).forEach(item => groups[k].push(cleanItem(item)));
         }
       });
       saveGroupsLocal();
     }
 
     if(Array.isArray(data.custom)){
-      localStorage.setItem("ps_custom_tiles", JSON.stringify(data.custom));
+      const custom = data.custom.slice(0,5).map(item => ({
+        name:String(item?.name || "Acceso").slice(0,80),
+        url:typeof normalizeUrl === "function" ? normalizeUrl(item?.url || "#") : "#",
+        icon:typeof safeIconUrl === "function" ? safeIconUrl(item?.icon || "") : ""
+      }));
+      localStorage.setItem(LS_CUSTOM_TILES, JSON.stringify(custom));
     }
 
     if(typeof renderAll === "function") renderAll();
@@ -178,22 +187,7 @@
       if(typeof groups === "object"){
         const obj = {};
         Object.keys(groups).forEach(k => obj[k] = (groups[k] || []).map(cleanItem));
-        localStorage.setItem(LS_GROUPS, JSON.stringify(obj));
-      }
-    }catch(e){}
-  }
-
-  function restoreLocalGroups(){
-    try{
-      const saved = JSON.parse(localStorage.getItem(LS_GROUPS) || "null");
-      if(saved && typeof groups === "object"){
-        Object.keys(saved).forEach(k => {
-          if(Array.isArray(saved[k]) && Array.isArray(groups[k])){
-            groups[k].length = 0;
-            saved[k].forEach(item => groups[k].push(cleanItem(item)));
-          }
-        });
-        if(typeof renderAll === "function") renderAll();
+        localStorage.setItem(LS_GROUPS, JSON.stringify({schemaVersion:2,groups:obj}));
       }
     }catch(e){}
   }
@@ -253,14 +247,23 @@
   }
 
   async function driveFetch(url, options={}){
+    const retry = !!options.__retry;
+    const requestOptions = {...options};
+    delete requestOptions.__retry;
     if(!accessToken) await requireToken();
     const res = await fetch(url, {
-      ...options,
+      ...requestOptions,
       headers: {
-        ...(options.headers || {}),
+        ...(requestOptions.headers || {}),
         Authorization: `Bearer ${accessToken}`
       }
     });
+    if(res.status === 401 && !retry){
+      accessToken = null;
+      localStorage.removeItem(LS_CONNECTED);
+      await requireToken();
+      return driveFetch(url,{...requestOptions,__retry:true});
+    }
     if(!res.ok){
       const text = await res.text().catch(()=>"");
       throw new Error(`Drive error ${res.status}: ${text || res.statusText}`);
@@ -327,7 +330,10 @@
       await saveNow();
       return;
     }
-    const data = await (await driveFetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`)).json();
+    const response = await driveFetch(`https://www.googleapis.com/drive/v3/files/${id}?alt=media`);
+    const text = await response.text();
+    if(text.length > 1000000) throw new Error("El respaldo supera el límite de 1 MB.");
+    const data = JSON.parse(text);
     applyConfig(data);
     localStorage.setItem(LS_CONNECTED, "1");
     localStorage.setItem(LS_LAST_SYNC, new Date().toISOString());
@@ -335,8 +341,13 @@
   }
 
   function disconnectDrive(){
+    if(accessToken && window.google?.accounts?.oauth2?.revoke){
+      google.accounts.oauth2.revoke(accessToken, () => {});
+    }
     accessToken = null;
+    driveFileId = "";
     localStorage.removeItem(LS_CONNECTED);
+    localStorage.removeItem(LS_FILE_ID);
     refreshPlusUI("Desconectado. La configuración local queda en este dispositivo.", "warn");
   }
 
@@ -355,6 +366,7 @@
     const reader = new FileReader();
     reader.onload = () => {
       try{
+        if(String(reader.result || "").length > 1000000) throw new Error("El respaldo supera el límite de 1 MB.");
         const data = JSON.parse(reader.result);
         applyConfig(data);
         queueCloudSave();
@@ -365,7 +377,7 @@
   }
 
   function refreshPlusUI(msg="", mode=""){
-    const connected = !!localStorage.getItem(LS_CONNECTED);
+    const connected = !!accessToken && !!localStorage.getItem(LS_CONNECTED);
     const dot = document.getElementById("plusDot");
     const small = document.getElementById("plusSmall");
     const status = document.getElementById("plusStatus");
@@ -380,6 +392,17 @@
   function showError(err){
     console.error(err);
     refreshPlusUI((err && err.message) ? err.message : "Error en Plus.", "warn");
+  }
+
+  function validateConfig(data){
+    if(!data || typeof data !== "object" || Array.isArray(data)) throw new Error("El respaldo no es válido.");
+    if(data.country && String(data.country).toUpperCase() !== COUNTRY) throw new Error(`El respaldo pertenece a ${data.country}, no a ${COUNTRY}.`);
+    if(!data.groups || typeof data.groups !== "object" || Array.isArray(data.groups)) throw new Error("El respaldo no contiene grupos válidos.");
+    const allowed = typeof groups === "object" ? Object.keys(groups) : [];
+    for(const [key,items] of Object.entries(data.groups)){
+      if(!allowed.includes(key) || !Array.isArray(items) || items.length > 100) throw new Error("El respaldo contiene grupos inválidos.");
+    }
+    if(data.custom && (!Array.isArray(data.custom) || data.custom.length > 5)) throw new Error("Los accesos personalizados no son válidos.");
   }
 
   function slugSafe(s){

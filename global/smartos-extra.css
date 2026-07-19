@@ -941,3 +941,17 @@
 .tile-icon .letter{color:#08213a!important;text-shadow:none!important;font-size:30px!important;line-height:1!important;max-width:90%;overflow:hidden;text-align:center;}
 .tile-icon.dark .letter{color:#fff!important;text-shadow:0 1px 10px rgba(0,0,0,.35)!important;}
 @media(max-width:920px){.country-global-pill{padding:0 8px}.country-select{max-width:112px;font-size:11px}.country-global-pill .status-icon{display:none}}
+
+
+/* v15 — botón Editar compacto en 1280 */
+@media (min-width:1121px) and (max-width:1300px){
+  #editBtn{
+    right:16px !important;
+    bottom:14px !important;
+    min-width:98px !important;
+    height:38px !important;
+    padding:0 13px !important;
+    font-size:13px !important;
+    box-shadow:0 9px 24px rgba(0,0,0,.42),0 0 15px rgba(41,216,255,.22) !important;
+  }
+}

@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://puntosmart.com.ar/</loc></url>
-  <url><loc>https://puntosmart.com.ar/instructivo/</loc></url>
-  <url><loc>https://puntosmart.com.ar/plus/</loc></url>
-  <url><loc>https://puntosmart.com.ar/privacidad/</loc></url>
-  <url><loc>https://puntosmart.com.ar/global/</loc></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://www.puntosmart.com.ar/</loc><lastmod>2026-07-18</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-AR" href="https://www.puntosmart.com.ar/"/><xhtml:link rel="alternate" hreflang="es-ES" href="https://www.puntosmart.com.ar/es/"/><xhtml:link rel="alternate" hreflang="es-MX" href="https://www.puntosmart.com.ar/mx/"/><xhtml:link rel="alternate" hreflang="pt-BR" href="https://www.puntosmart.com.ar/br/"/><xhtml:link rel="alternate" hreflang="fr-FR" href="https://www.puntosmart.com.ar/fr/"/><xhtml:link rel="alternate" hreflang="en-US" href="https://www.puntosmart.com.ar/us/"/><xhtml:link rel="alternate" hreflang="x-default" href="https://www.puntosmart.com.ar/"/>
+  </url>
+  <url><loc>https://www.puntosmart.com.ar/es/</loc><lastmod>2026-07-18</lastmod></url>
+  <url><loc>https://www.puntosmart.com.ar/mx/</loc><lastmod>2026-07-18</lastmod></url>
+  <url><loc>https://www.puntosmart.com.ar/br/</loc><lastmod>2026-07-18</lastmod></url>
+  <url><loc>https://www.puntosmart.com.ar/fr/</loc><lastmod>2026-07-18</lastmod></url>
+  <url><loc>https://www.puntosmart.com.ar/us/</loc><lastmod>2026-07-18</lastmod></url>
+  <url><loc>https://www.puntosmart.com.ar/plus/</loc><lastmod>2026-07-18</lastmod></url>
+  <url><loc>https://www.puntosmart.com.ar/instructivo/</loc><lastmod>2026-07-18</lastmod></url>
+  <url><loc>https://www.puntosmart.com.ar/privacidad/</loc><lastmod>2026-07-18</lastmod></url>
+  <url><loc>https://www.puntosmart.com.ar/legal/</loc><lastmod>2026-07-18</lastmod></url>
 </urlset>

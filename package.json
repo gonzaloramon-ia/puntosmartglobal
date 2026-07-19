@@ -1,0 +1,22 @@
+{
+  "name": "puntosmart-os-rebuild",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Punto Smart OS corregido con pruebas de integridad y flujos principales.",
+  "type": "module",
+  "scripts": {
+    "icons:cache": "node scripts/cache-icons.mjs",
+    "icons:brands": "node scripts/render-brand-icons.mjs",
+    "test": "npm run test:static && npm run test:seo && npm run test:dom && npm run test:visual",
+    "test:static": "node tests/static-audit.mjs",
+    "test:seo": "node tests/seo-audit.mjs",
+    "test:dom": "node --test tests/dom-smoke.test.mjs",
+    "test:visual": "node --test tests/visual-smoke.test.mjs"
+  },
+  "devDependencies": {
+    "@sparticuz/chromium": "^149.0.0",
+    "jsdom": "^26.1.0",
+    "puppeteer-core": "^25.3.0",
+    "simple-icons": "^16.26.0"
+  }
+}

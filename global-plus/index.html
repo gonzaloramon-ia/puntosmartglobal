@@ -4,17 +4,27 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#020713" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com; style-src 'self'; img-src 'self' data: https:; connect-src https://api.open-meteo.com https://api.frankfurter.dev https://accounts.google.com https://oauth2.googleapis.com https://www.googleapis.com; frame-src https://accounts.google.com; base-uri 'self'; object-src 'none'; frame-ancestors 'none'" />
   <title>Punto Smart OS Global Plus | Tu escritorio online sincronizado</title>
   <meta name="description" content="Punto Smart OS Global Plus guarda y sincroniza tu escritorio online para recuperarlo desde cualquier dispositivo." />
+  <meta name="robots" content="noindex,follow" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Punto Smart OS" />
+  <meta property="og:title" content="Punto Smart OS Global Plus" />
+  <meta property="og:description" content="Sincronización y recuperación de tu escritorio online con dos meses gratis." />
+  <meta property="og:image" content="https://www.puntosmart.com.ar/favicon.png" />
+  <meta name="twitter:card" content="summary" />
 
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="apple-touch-icon" href="favicon.png" />
+  <link rel="manifest" href="../site.webmanifest" />
 
-  <link rel="stylesheet" href="styles.css?v=107" />
-  <link rel="stylesheet" href="smartos-extra.css?v=108" />
+  <link rel="stylesheet" href="styles.css?v=190" />
+  <link rel="stylesheet" href="smartos-extra.css?v=180" />
+  <link rel="stylesheet" href="../reliability.css?v=5" />
   <link rel="stylesheet" href="plus.css?v=99" />
-</head>
+<!-- Punto Smart OS - desarrollo original de Punto Smart - Punto Smart marca registrada ante INPI --></head>
 <body>
   <div class="app-shell">
     <header class="topbar">
@@ -28,25 +38,25 @@
           <span class="status-icon">◷</span>
           <span><b id="clock">--:--</b><small id="dateText">Cargando...</small></span>
         </div>
-        <a id="weatherLink" class="status-pill hide-small" data-open="https://www.google.com/search?q=weather" href="https://www.google.com/search?q=weather" target="_blank" rel="noopener">
-          <span class="status-icon weather">☁</span>
-          <span><b>Clima</b><small>Buenos Aires</small></span>
+        <a id="weatherLink" class="status-pill hide-small weather-live" href="https://www.google.com/search?q=weather" target="_blank" rel="noopener" aria-live="polite">
+          <span class="status-icon weather" id="globalWeatherIcon">☁</span>
+          <span class="live-status-copy"><b id="globalWeatherMain">Clima</b><small id="globalWeatherSub">Cargando…</small></span>
         </a>
-        <a id="currencyLink" class="status-pill dolar" href="https://www.google.com/search?q=exchange+rate" target="_blank" rel="noopener">
+        <a id="currencyLink" class="status-pill dolar dollar-live" href="https://www.google.com/search?q=exchange+rate" target="_blank" rel="noopener" aria-live="polite">
           <span class="dolar-logo">$</span>
-          <span><b>Dólar Hoy</b></span>
+          <span class="live-status-copy"><b id="globalCurrencyMain">Cotización</b><small id="globalCurrencySub">Cargando…</small></span>
         </a>
 
         <div class="status-pill country-global-pill">
           <span class="status-icon">🌎</span>
           <span><b id="countryLabel">País</b><small><select id="countrySelect" class="country-select" aria-label="Cambiar país"></select></small></span>
         </div>
-        <button class="gear" id="resetBtn" title="Restaurar orden y accesos">⚙</button>
+        <button class="gear" id="resetBtn" type="button" title="Restaurar orden y accesos" aria-label="Restaurar orden y accesos">↺ <span class="reset-label">Restaurar</span></button>
       </div>
     </header>
 
     <main>
-      <section class="os-slogan" aria-label="Descripción de Punto Smart OS">Interfaz Híbrida Operativa. Entorno Adaptable a tu gusto.</section>
+      <h1 class="os-slogan">Interfaz Híbrida Operativa. Entorno Adaptable a tu gusto.</h1>
 
       <section class="smart-search" aria-label="Smart OS Browser">
         <div class="smart-search-head">
@@ -139,7 +149,7 @@
         </article>
       </section>
 
-      <a class="ad-banner bottom-ad" href="../plus/">
+      <a class="ad-banner bottom-ad" href="mailto:punto.smart.arg@gmail.com?subject=Publicidad%20en%20Punto%20Smart%20OS">
         <span class="ad-icon">📣</span>
         <span class="ad-copy"><b>Llegá a más personas</b><small>Anunciá tu producto o servicio en Punto Smart OS.</small></span>
         <span class="ad-cta">ANUNCIÁ ACÁ</span>
@@ -149,10 +159,11 @@
     <footer class="footer">
       <div><b>PUNTO SMART OS</b><small>Tu portal. Todo en un lugar.</small></div>
       <button id="editBtn">✎ Editar</button>
-      <button id="supportBtn">? Soporte</button>
+      <button type="button" data-install-app hidden>Instalar app</button>
+      <button id="supportBtn">Soporte</button>
       <a id="guideBtn" class="footer-link-btn" href="../instructivo/">Cómo usarlo</a>
-      <button id="suggestBtn">☏ Sugerencias</button>
-      <span>© 2026 Punto Smart OS</span>
+      <button id="suggestBtn">Sugerencias</button>
+      <span>© 2026 Punto Smart. Punto Smart® registered trademark. Punto Smart OS™ original product. <a href="../legal/">Legal</a></span>
     </footer>
   </div>
 
@@ -197,8 +208,24 @@
     </div>
   </dialog>
 
+  <dialog id="contactDialog" class="modal">
+    <div class="info-content contact-content">
+      <button class="modal-close" id="closeContactBtn" type="button" aria-label="Cerrar">×</button>
+      <h3 id="contactTitle">Soporte</h3>
+      <p id="contactText">Contactá al equipo de Punto Smart OS.</p>
+      <label id="contactEmailLabel" for="contactEmail">Correo de contacto</label>
+      <input id="contactEmail" type="email" value="punto.smart.arg@gmail.com" readonly />
+      <div class="contact-actions">
+        <button id="copyContactBtn" class="primary" type="button">Copiar correo</button>
+        <button id="dismissContactBtn" type="button">Cerrar</button>
+      </div>
+      <p id="contactCopyStatus" class="contact-copy-status" role="status" aria-live="polite"></p>
+    </div>
+  </dialog>
+
   <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden />
-  <script src="script.js?v=208"></script>
+  <script src="script.js?v=202"></script>
+  <script src="../install.js?v=1"></script>
   <script src="https://accounts.google.com/gsi/client"></script>
   <script src="plus-config.js?v=97"></script>
   <script src="plus-drive.js?v=98"></script>

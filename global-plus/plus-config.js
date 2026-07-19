@@ -3,6 +3,5 @@
 // Este dato NO es secreto. El secreto del cliente NO debe ir en la web.
 window.PS_PLUS_CONFIG = {
   GOOGLE_CLIENT_ID: "819470697641-ddj3tf5jip31qc1ar5047vbjcnc11eh9.apps.googleusercontent.com",
-  DRIVE_FILE_NAME: "puntosmart-config.json",
   DRIVE_SCOPE: "https://www.googleapis.com/auth/drive.appdata"
 };

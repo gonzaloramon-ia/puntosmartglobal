@@ -935,3 +935,118 @@
 .tile-icon .letter{color:#08213a!important;text-shadow:none!important;font-size:30px!important;line-height:1!important;max-width:90%;overflow:hidden;text-align:center;}
 .tile-icon.dark .letter{color:#fff!important;text-shadow:0 1px 10px rgba(0,0,0,.35)!important;}
 @media(max-width:920px){.country-global-pill{padding:0 8px}.country-select{max-width:112px;font-size:11px}.country-global-pill .status-icon{display:none}}
+
+
+/* v15 — botón Editar compacto en 1280 */
+@media (min-width:1121px) and (max-width:1300px){
+  #editBtn{
+    right:16px !important;
+    bottom:14px !important;
+    min-width:98px !important;
+    height:38px !important;
+    padding:0 13px !important;
+    font-size:13px !important;
+    box-shadow:0 9px 24px rgba(0,0,0,.42),0 0 15px rgba(41,216,255,.22) !important;
+  }
+}
+
+
+/* v17 — nuevo mensaje principal */
+.os-slogan-v17{
+  display:flex !important;
+  flex-direction:column;
+  align-items:center;
+  gap:2px;
+  max-width:860px;
+  margin:0 auto 14px;
+  padding:0 14px;
+  text-align:center;
+  line-height:1.18;
+}
+.os-slogan-v17 strong{
+  color:#39cfff;
+  font-size:14px;
+  font-weight:900;
+  letter-spacing:1.7px;
+  text-transform:uppercase;
+}
+.os-slogan-v17 span{
+  color:#f3f8ff;
+  font-size:21px;
+  font-weight:900;
+}
+.os-slogan-v17 small{
+  color:#b9c9dc;
+  font-size:15px;
+  font-weight:700;
+}
+
+@media (min-width:1121px) and (max-width:1300px){
+  .os-slogan-v17{margin-bottom:12px;}
+  .os-slogan-v17 strong{font-size:12px}
+  .os-slogan-v17 span{font-size:18px}
+  .os-slogan-v17 small{font-size:13px}
+}
+
+@media(max-width:620px){
+  .os-slogan-v17 strong{font-size:11px}
+  .os-slogan-v17 span{font-size:16px}
+  .os-slogan-v17 small{font-size:12px}
+}
+
+
+/* v18 — slogan simple y bloque de frase más compacto */
+.os-slogan-v18{
+  display:block !important;
+  max-width:920px;
+  margin:0 auto 10px;
+  padding:0 12px;
+  color:#f3f8ff;
+  text-align:center;
+  font-size:20px;
+  line-height:1.18;
+  font-weight:900;
+}
+
+.phrase-day-card{
+  min-height:0 !important;
+  max-width:760px;
+  margin:12px auto 16px !important;
+  padding:8px 16px 10px !important;
+}
+.phrase-day-label{
+  margin-bottom:3px !important;
+}
+.phrase-day-card .daily-phrase{
+  margin:0 !important;
+  min-height:0 !important;
+  line-height:1.15 !important;
+}
+
+@media (min-width:1121px) and (max-width:1300px){
+  .os-slogan-v18{
+    margin-bottom:9px;
+    font-size:17px;
+  }
+  .phrase-day-card{
+    margin:10px auto 13px !important;
+    padding:7px 14px 9px !important;
+  }
+  .phrase-day-label{
+    font-size:10px !important;
+  }
+  .phrase-day-card .daily-phrase{
+    font-size:20px !important;
+  }
+}
+
+@media(max-width:620px){
+  .os-slogan-v18{
+    font-size:15px;
+    margin-bottom:8px;
+  }
+  .phrase-day-card{
+    margin:10px auto 12px !important;
+    padding:7px 10px 9px !important;
+  }
+}
