@@ -69,13 +69,11 @@ for(const viewport of [{width:360,height:800},{width:768,height:1024},{width:136
   test(`Free no desborda en ${viewport.width}px y mantiene controles visibles`,async()=>{
     const {page,errors}=await open('/',viewport.width,viewport.height);
     const layout=await page.evaluate(()=>{
-      const gear=document.getElementById('resetBtn');
       const edit=document.getElementById('editBtn');
       return {
         viewport:document.documentElement.clientWidth,
         scroll:document.documentElement.scrollWidth,
-        gearDisplay:getComputedStyle(gear).display,
-        gearWidth:gear.getBoundingClientRect().width,
+        resetPresent:document.getElementById('resetBtn')!==null,
         editPosition:getComputedStyle(edit).position,
         editInsideFooter:edit.closest('.footer') !== null,
         headerOverlaps:(items=>items.flatMap((item,index)=>items.slice(index+1).flatMap(other=>{
@@ -89,8 +87,7 @@ for(const viewport of [{width:360,height:800},{width:768,height:1024},{width:136
     });
     assert.equal(errors.length,0,errors.join('\n'));
     assert(layout.scroll<=layout.viewport+1,`Overflow ${layout.scroll-layout.viewport}px`);
-    assert.notEqual(layout.gearDisplay,'none');
-    assert(layout.gearWidth>=40,`Reset demasiado pequeño: ${layout.gearWidth}px`);
+    assert.equal(layout.resetPresent,false,'Restaurar no debe aparecer en la home.');
     assert.equal(layout.editPosition,'static');
     assert(layout.editInsideFooter);
     assert.deepEqual(layout.headerOverlaps,[],`Controles superpuestos: ${layout.headerOverlaps.join(', ')}`);
@@ -99,8 +96,26 @@ for(const viewport of [{width:360,height:800},{width:768,height:1024},{width:136
   });
 }
 
-for(const country of ['BR','FR']){
-  test(`Global ${country} muestra datos live sin quedar cargando`,async()=>{
+test('La búsqueda visual se abre completa y sin desborde en móvil',async()=>{
+  const {page,errors}=await open('/',390,844);
+  await page.click('#visualSearchBtn');
+  const state=await page.evaluate(()=>({
+    open:document.getElementById('visualSearchDialog').open,
+    overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
+    providers:document.querySelectorAll('[data-visual-provider]').length,
+    allButton:Boolean(document.getElementById('visualSearchAllBtn'))
+  }));
+  assert.equal(errors.length,0,errors.join('\n'));
+  assert(state.open);
+  assert(state.overflow<=1);
+  assert.equal(state.providers,4);
+  assert(state.allButton);
+  await page.screenshot({path:'/tmp/puntosmart-visual-search-mobile.png',fullPage:true});
+  await page.close();
+});
+
+for(const country of ['MX','BR','FR','US','ES']){
+  test(`Global ${country} replica la búsqueda y beneficios de Argentina`,async()=>{
     const {page,errors}=await open(`/global/?country=${country}`,390,844);
     const state=await page.evaluate(()=>({
       overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
@@ -109,17 +124,30 @@ for(const country of ['BR','FR']){
       title:document.title,
       remoteFavicons:document.querySelectorAll('.tile img[src*="google.com/s2/favicons"]').length,
       localIcons:document.querySelectorAll('.tile img[src*="/assets/icons/"]').length,
-      whatsapp:[...document.querySelectorAll('.tile')].find(tile=>tile.textContent.includes('WhatsApp'))?.querySelector('img')?.src
+      whatsapp:[...document.querySelectorAll('.tile')].find(tile=>tile.textContent.includes('WhatsApp'))?.querySelector('img')?.src,
+      benefits:[...document.querySelectorAll('.benefits-v2 .benefit-item')].map(item=>item.textContent.trim()),
+      privacy:document.getElementById('benefitPrivacyText')?.textContent,
+      categories:document.querySelectorAll('.search-category').length
     }));
     assert.equal(errors.length,0,errors.join('\n'));
     assert(state.overflow<=1);
     assert(!state.weather.includes('Cargando'));
     assert(!state.currency.includes('Cargando'));
-    assert(country==='BR' ? /Brasil/.test(state.title) : /France/.test(state.title));
+    assert(country==='BR' ? /Brasil/.test(state.title) : country==='FR' ? /France/.test(state.title) : state.title.includes('Punto Smart OS'));
     assert.equal(state.remoteFavicons,0,'Los accesos fijos no deben consultar favicons remotos.');
     assert(state.localIcons>20,`Se esperaban iconos locales y se encontraron ${state.localIcons}.`);
     assert.match(state.whatsapp,/\/assets\/icons\/web-whatsapp-com\.png$/);
-    await page.click('.engine-pill[data-engine="soporte"]');
+    assert.equal(state.benefits.length,2);
+    assert(state.benefits.every(Boolean));
+    assert.match(state.privacy,/Punto Smart OS|información|information|informações|informations/i);
+    assert.equal(state.categories,6);
+    await page.click('#visualSearchBtn');
+    const visual=await page.evaluate(()=>({open:document.getElementById('visualSearchDialog').open,providers:document.querySelectorAll('[data-visual-provider]').length,overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth}));
+    assert(visual.open);
+    assert.equal(visual.providers,4);
+    assert(visual.overflow<=1);
+    await page.click('#closeVisualSearchBtn');
+    await page.click('#supportBtn');
     const contact=await page.evaluate(()=>({
       open:document.getElementById('contactDialog').open,
       email:document.getElementById('contactEmail').value,
@@ -128,6 +156,25 @@ for(const country of ['BR','FR']){
     assert(contact.open,'Soporte debe abrir el contacto dentro de Punto Smart OS.');
     assert.equal(contact.email,'punto.smart.arg@gmail.com');
     assert(contact.overflow<=1);
+    await page.screenshot({path:`/tmp/puntosmart-global-${country.toLowerCase()}-mobile.png`,fullPage:true});
+    await page.close();
+  });
+}
+
+for(const country of ['BR','FR','US']){
+  test(`Global Plus ${country} conserva la misma interfaz base`,async()=>{
+    const {page,errors}=await open(`/global-plus/?country=${country}`,390,844);
+    const state=await page.evaluate(()=>({
+      overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
+      benefits:document.querySelectorAll('.benefits-v2 .benefit-item').length,
+      categories:document.querySelectorAll('.search-category').length,
+      visual:document.querySelectorAll('[data-visual-provider]').length
+    }));
+    assert.equal(errors.length,0,errors.join('\n'));
+    assert(state.overflow<=1);
+    assert.equal(state.benefits,2);
+    assert.equal(state.categories,6);
+    assert.equal(state.visual,4);
     await page.close();
   });
 }
@@ -157,12 +204,12 @@ test('Plus carga sin desborde y con Drive desconectado',async()=>{
   const state=await page.evaluate(()=>({
     overflow:document.documentElement.scrollWidth-document.documentElement.clientWidth,
     drive:document.getElementById('plusSmall')?.textContent,
-    gear:getComputedStyle(document.getElementById('resetBtn')).display
+    resetPresent:document.getElementById('resetBtn')!==null
   }));
   assert.equal(errors.length,0,errors.join('\n'));
   assert(state.overflow<=1);
   assert.equal(state.drive,'Drive');
-  assert.notEqual(state.gear,'none');
+  assert.equal(state.resetPresent,false);
   await page.close();
 });
 

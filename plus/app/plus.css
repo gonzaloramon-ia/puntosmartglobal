@@ -45,3 +45,11 @@
   .plus-actions{grid-template-columns:1fr}
   .plus-panel{padding:22px;min-width:min(480px,calc(100vw - 22px))}
 }
+
+.plus-account{display:flex;align-items:center;gap:11px;margin:12px 0;padding:10px 12px;border:1px solid rgba(47,216,255,.2);border-radius:12px;background:rgba(20,86,139,.12)}
+.plus-account[hidden]{display:none}
+.plus-account img{width:38px;height:38px;border-radius:50%;object-fit:cover;background:#fff}
+.plus-account b{display:block;color:#f2f7ff;font-size:14px}
+.plus-account small{margin:3px 0 0;color:#a9bdd3;font-size:12px;overflow-wrap:anywhere}
+.plus-sync-meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:-5px 2px 13px;color:#91a6bd;font-size:11px}
+.plus-sync-meta .is-ok{color:#54f6a2}.plus-sync-meta .is-warn{color:#ffd76b}

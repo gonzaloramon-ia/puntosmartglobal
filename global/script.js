@@ -94,6 +94,66 @@ function getUiText(){
 
 const ACTIVE_PRESET = GLOBAL_PRESETS[GLOBAL_COUNTRY] || GLOBAL_PRESETS.US;
 localStorage.setItem('ps_global_country', GLOBAL_COUNTRY);
+
+function getGlobalMarketingCopy(){
+  const copy={
+    en:{
+      lead:'The first Operating System that goes wherever you go.',
+      speed:'Faster, lighter, with no apps to install.',
+      devices:'Use it from any device, with no storage space required.',
+      privacy:'We do not collect your personal information.',
+      categories:{web:'Web',ai:'AI',videos:'Videos',buy:'Shop',news:'News',maps:'Maps'},
+      search:{google:'Search Google...',ai:'Ask AI...',videos:'Search videos...',buy:'Search products...',news:'Search the news...',maps:'Search places...'},
+      visual:{button:'Search by image',title:'Search by image',intro:'Use a photo, screenshot or camera to find matches, products and visual information.',all:'Search all',group:'Choose a visual search engine',close:'Close image search',note:'The image is uploaded directly to the search engine you choose. Punto Smart OS does not store or process it.',opened:'{service} opened. Upload the image there to start the search.',openedAll:'We opened the four search engines. If your browser blocked a tab, open it from this list.',details:{google:'Identify and find products',bing:'Similar images, text and objects',tineye:'Track copies of an image',yandex:'Matches and similar objects'}}
+    },
+    es:{
+      lead:'El primer Sistema Operativo que te acompaña a todos lados.',
+      speed:'Más rápido, más liviano y sin instalar apps.',
+      devices:'Usalo desde cualquier dispositivo, sin ocupar espacio.',
+      privacy:'No recopilamos tu información personal.',
+      categories:{web:'Web',ai:'IA',videos:'Videos',buy:'Comprar',news:'Noticias',maps:'Maps'},
+      search:{google:'Buscar en Google...',ai:'Preguntarle a la IA...',videos:'Buscar videos...',buy:'Buscar productos...',news:'Buscar noticias...',maps:'Buscar lugares...'},
+      visual:{button:'Buscar por imagen',title:'Buscar por imagen',intro:'Usá una foto, captura o cámara para encontrar coincidencias, productos e información visual.',all:'Buscar en todos',group:'Elegí un buscador visual',close:'Cerrar búsqueda por imagen',note:'La imagen se sube directamente al buscador que elijas. Punto Smart OS no la guarda ni la procesa.',opened:'Se abrió {service}. Subí la imagen directamente allí para iniciar la búsqueda.',openedAll:'Abrimos los cuatro buscadores. Si el navegador bloqueó alguna pestaña, podés abrirla desde esta lista.',details:{google:'Identificar y encontrar productos',bing:'Similares, texto y objetos',tineye:'Rastrear copias de una imagen',yandex:'Coincidencias y objetos similares'}}
+    },
+    pt:{
+      lead:'O primeiro Sistema Operacional que acompanha você onde você for.',
+      speed:'Mais rápido, mais leve e sem instalar apps.',
+      devices:'Use em qualquer dispositivo, sem ocupar espaço.',
+      privacy:'Não coletamos suas informações pessoais.',
+      categories:{web:'Web',ai:'IA',videos:'Vídeos',buy:'Comprar',news:'Notícias',maps:'Mapas'},
+      search:{google:'Buscar no Google...',ai:'Perguntar à IA...',videos:'Buscar vídeos...',buy:'Buscar produtos...',news:'Buscar notícias...',maps:'Buscar lugares...'},
+      visual:{button:'Pesquisar por imagem',title:'Pesquisar por imagem',intro:'Use uma foto, captura de tela ou câmera para encontrar correspondências, produtos e informações visuais.',all:'Pesquisar em todos',group:'Escolha um buscador visual',close:'Fechar pesquisa por imagem',note:'A imagem é enviada diretamente ao buscador escolhido. O Punto Smart OS não a armazena nem processa.',opened:'{service} foi aberto. Envie a imagem diretamente lá para iniciar a pesquisa.',openedAll:'Abrimos os quatro buscadores. Se o navegador bloqueou alguma aba, você pode abri-la nesta lista.',details:{google:'Identificar e encontrar produtos',bing:'Similares, textos e objetos',tineye:'Rastrear cópias de uma imagem',yandex:'Correspondências e objetos semelhantes'}}
+    },
+    fr:{
+      lead:'Le premier système d’exploitation qui vous accompagne partout.',
+      speed:'Plus rapide, plus léger, sans installer d’apps.',
+      devices:'Utilisez-le depuis n’importe quel appareil, sans occuper d’espace.',
+      privacy:'Nous ne collectons pas vos informations personnelles.',
+      categories:{web:'Web',ai:'IA',videos:'Vidéos',buy:'Acheter',news:'Actus',maps:'Cartes'},
+      search:{google:'Rechercher sur Google...',ai:'Demander à l’IA...',videos:'Rechercher des vidéos...',buy:'Rechercher des produits...',news:'Rechercher les actualités...',maps:'Rechercher des lieux...'},
+      visual:{button:'Rechercher par image',title:'Rechercher par image',intro:'Utilisez une photo, une capture ou l’appareil photo pour trouver des correspondances, produits et informations visuelles.',all:'Rechercher partout',group:'Choisissez un moteur de recherche visuel',close:'Fermer la recherche par image',note:'L’image est envoyée directement au moteur choisi. Punto Smart OS ne la stocke ni ne la traite.',opened:'{service} est ouvert. Importez l’image directement là-bas pour lancer la recherche.',openedAll:'Nous avons ouvert les quatre moteurs. Si votre navigateur a bloqué un onglet, ouvrez-le depuis cette liste.',details:{google:'Identifier et trouver des produits',bing:'Similaires, texte et objets',tineye:'Retrouver les copies d’une image',yandex:'Correspondances et objets similaires'}}
+    }
+  };
+  return copy[ACTIVE_PRESET.htmlLang] || copy.en;
+}
+
+function applyGlobalMarketingCopy(){
+  const copy=getGlobalMarketingCopy();
+  const set=(id,value)=>{ const el=document.getElementById(id); if(el) el.textContent=value; };
+  set('benefitLeadText',copy.lead);
+  set('benefitSpeedText',copy.speed);
+  set('benefitDevicesText',copy.devices);
+  const privacy=document.getElementById('benefitPrivacyText');
+  if(privacy && privacy.firstChild) privacy.firstChild.nodeValue=`${copy.privacy} `;
+  const visualButton=document.getElementById('visualSearchBtn');
+  if(visualButton){visualButton.title=copy.visual.button;visualButton.setAttribute('aria-label',copy.visual.button);}
+  const closeButton=document.getElementById('closeVisualSearchBtn'); if(closeButton) closeButton.setAttribute('aria-label',copy.visual.close);
+  set('visualSearchTitle',copy.visual.title);
+  set('visualSearchIntro',copy.visual.intro);
+  set('visualSearchAllBtn',`⌘ ${copy.visual.all}`);
+  const group=document.querySelector('.visual-search-options'); if(group) group.setAttribute('aria-label',copy.visual.group);
+  document.querySelectorAll('[data-visual-detail]').forEach(el=>{ const detail=copy.visual.details[el.dataset.visualDetail]; if(detail) el.textContent=detail; });
+}
 const groups = JSON.parse(JSON.stringify(ACTIVE_PRESET.groups));
 const folderNames = ACTIVE_PRESET.folderNames;
 
@@ -718,47 +778,114 @@ function openFolder(key){
 }
 closeFolderBtn.onclick = () => closeDialog(folderDialog);
 
-let smartSearchEngine = 'google';
-const smartSearchDefaults = ACTIVE_PRESET.smart.defaults;
-const smartSearchPlaceholders = ACTIVE_PRESET.smart.placeholders;
-function buildSmartSearchUrl(engine, query){
-  const q = (query || '').trim();
-  if(!q) return smartSearchDefaults[engine] || smartSearchDefaults.google;
-  const e = encodeURIComponent(q);
-  const tpl = (ACTIVE_PRESET.smart.templates && ACTIVE_PRESET.smart.templates[engine]) || ACTIVE_PRESET.smart.templates.google;
-  return tpl.replaceAll('{q}', e).replaceAll('{raw}', encodeURIComponent(q));
+let smartSearchCategory='web';
+const SMART_SEARCH_STORAGE=`ps_global_search_providers_v2_${GLOBAL_COUNTRY}`;
+const SMART_SEARCH_CATEGORY_STORAGE=`ps_global_search_category_v2_${GLOBAL_COUNTRY}`;
+const SMART_ICON_BASE='../assets/icons/';
+const smartProviderIcon=file=>`${SMART_ICON_BASE}${file}`;
+const globalSearchMarkets={
+  US:{google:'https://www.google.com/',googleIcon:'google-com.png',buy:{id:'amazon',name:'Amazon',icon:'amazon-com.png',home:'https://www.amazon.com/',search:q=>`https://www.amazon.com/s?k=${encodeURIComponent(q)}`},news:{name:'CNN',icon:'cnn-com.png',domain:'cnn.com'}},
+  ES:{google:'https://www.google.es/',googleIcon:'google-es.png',buy:{id:'amazon',name:'Amazon',icon:'amazon-es.png',home:'https://www.amazon.es/',search:q=>`https://www.amazon.es/s?k=${encodeURIComponent(q)}`},news:{name:'El País',icon:'elpais-com.png',domain:'elpais.com'}},
+  MX:{google:'https://www.google.com.mx/',googleIcon:'google-com-mx.png',buy:{id:'mercado-libre',name:'Mercado Libre',icon:'mercadolibre-com-mx.png',home:'https://www.mercadolibre.com.mx/',search:q=>`https://listado.mercadolibre.com.mx/${encodeURIComponent(q)}`},news:{name:'El Universal',icon:'eluniversal-com-mx.png',domain:'eluniversal.com.mx'}},
+  BR:{google:'https://www.google.com.br/',googleIcon:'google-com-br.png',buy:{id:'mercado-livre',name:'Mercado Livre',icon:'mercadolivre-com-br.png',home:'https://www.mercadolivre.com.br/',search:q=>`https://lista.mercadolivre.com.br/${encodeURIComponent(q)}`},news:{name:'Globo',icon:'globo-com.png',domain:'globo.com'}},
+  FR:{google:'https://www.google.fr/',googleIcon:'google-fr.png',buy:{id:'amazon',name:'Amazon',icon:'amazon-fr.png',home:'https://www.amazon.fr/',search:q=>`https://www.amazon.fr/s?k=${encodeURIComponent(q)}`},news:{name:'Le Monde',icon:'lemonde-fr.png',domain:'lemonde.fr'}}
+};
+function globalSearchProvider(id,name,icon,home,search,placeholder){return{id,name,icon:smartProviderIcon(icon),home,search,placeholder};}
+function globalNewsSearch(q){
+  const locale=ACTIVE_PRESET.locale || 'en-US';
+  const country=GLOBAL_COUNTRY || 'US';
+  return `https://news.google.com/search?q=${encodeURIComponent(q)}&hl=${locale}&gl=${country}&ceid=${country}:${locale.split('-')[0]}`;
 }
-function filterTiles(query){
-  const q = cleanText(query);
-  document.querySelectorAll('.tile,.custom-tile').forEach(el => {
-    const text = cleanText(el.textContent);
-    el.classList.toggle('hidden-search', !!q && !text.includes(q));
+function buildGlobalSmartSearchProviders(){
+  const copy=getGlobalMarketingCopy();
+  const market=globalSearchMarkets[GLOBAL_COUNTRY] || globalSearchMarkets.US;
+  const google=(q='')=>q?`${market.google}search?q=${encodeURIComponent(q)}`:market.google;
+  const maps=q=>q?`https://www.google.com/maps/search/${encodeURIComponent(q)}`:'https://www.google.com/maps';
+  const nationalNews=market.news;
+  return {
+    web:[
+      globalSearchProvider('google','Google',market.googleIcon,market.google,google,copy.search.google),
+      globalSearchProvider('bing','Bing','google-com.png','https://www.bing.com/',q=>`https://www.bing.com/search?q=${encodeURIComponent(q)}`,copy.search.google),
+      globalSearchProvider('yahoo','Yahoo','google-com.png','https://search.yahoo.com/',q=>`https://search.yahoo.com/search?p=${encodeURIComponent(q)}`,copy.search.google)
+    ],
+    ai:[
+      globalSearchProvider('chatgpt','ChatGPT','chatgpt-com.png','https://chatgpt.com/',q=>`https://chatgpt.com/?q=${encodeURIComponent(q)}`,copy.search.ai),
+      globalSearchProvider('gemini','Gemini','gemini-google-com.png','https://gemini.google.com/app',q=>`https://gemini.google.com/app?prompt=${encodeURIComponent(q)}`,copy.search.ai),
+      globalSearchProvider('claude','Claude','claude-ai.png','https://claude.ai/new',q=>`https://claude.ai/new?q=${encodeURIComponent(q)}`,copy.search.ai)
+    ],
+    videos:[globalSearchProvider('youtube','YouTube','youtube-com.png','https://www.youtube.com/',q=>`https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`,copy.search.videos)],
+    buy:[
+      globalSearchProvider(market.buy.id,market.buy.name,market.buy.icon,market.buy.home,market.buy.search,copy.search.buy),
+      globalSearchProvider('google-shopping','Google',market.googleIcon,market.google,q=>google(`${q} shopping`),copy.search.buy)
+    ],
+    news:[
+      globalSearchProvider('google-news','Google News',market.googleIcon,globalNewsSearch(''),globalNewsSearch,copy.search.news),
+      globalSearchProvider('national-news',nationalNews.name,nationalNews.icon,`https://www.google.com/search?q=${encodeURIComponent(`site:${nationalNews.domain}`)}`,q=>google(`site:${nationalNews.domain} ${q}`),copy.search.news)
+    ],
+    maps:[globalSearchProvider('google-maps','Google Maps','maps-google-com.png','https://www.google.com/maps',maps,copy.search.maps)]
+  };
+}
+const smartSearchProviders=buildGlobalSmartSearchProviders();
+let smartProviderSelections={};
+try{smartProviderSelections=JSON.parse(localStorage.getItem(SMART_SEARCH_STORAGE)||'{}')||{};}catch(e){}
+Object.entries(smartSearchProviders).forEach(([category,providers])=>{if(!providers.some(provider=>provider.id===smartProviderSelections[category])) smartProviderSelections[category]=providers[0].id;});
+try{const savedCategory=localStorage.getItem(SMART_SEARCH_CATEGORY_STORAGE);if(savedCategory&&smartSearchProviders[savedCategory]) smartSearchCategory=savedCategory;}catch(e){}
+function smartProvider(category=smartSearchCategory){const providers=smartSearchProviders[category]||smartSearchProviders.web;return providers.find(provider=>provider.id===smartProviderSelections[category])||providers[0];}
+function closeSmartProviderMenus(except=''){
+  document.querySelectorAll('.search-provider-menu').forEach(menu=>{const open=!!except&&menu.dataset.providerMenu===except;menu.classList.toggle('open',open);});
+  document.querySelectorAll('.search-category').forEach(button=>button.setAttribute('aria-expanded',String(!!except&&button.dataset.category===except)));
+}
+function updateSmartSearchUI(){
+  const copy=getGlobalMarketingCopy();
+  const provider=smartProvider();
+  document.querySelectorAll('.search-category').forEach(button=>{
+    const category=button.dataset.category;
+    button.classList.toggle('active',category===smartSearchCategory);
+    const icon=button.querySelector('.search-category-icon'); if(icon) icon.src=smartProvider(category).icon;
+    const label=button.querySelector('span:not(.search-caret)'); if(label) label.textContent=copy.categories[category]||category;
   });
+  if(searchInput) searchInput.placeholder=provider.placeholder;
+  const activeIcon=document.getElementById('activeSearchIcon'); if(activeIcon) activeIcon.src=provider.icon;
+  try{localStorage.setItem(SMART_SEARCH_STORAGE,JSON.stringify(smartProviderSelections));localStorage.setItem(SMART_SEARCH_CATEGORY_STORAGE,smartSearchCategory);}catch(e){}
 }
-function setSmartSearchEngine(engine){
-  smartSearchEngine = engine || 'google';
-  document.querySelectorAll('.engine-pill').forEach(btn => btn.classList.toggle('active', btn.dataset.engine === smartSearchEngine));
-  const box = document.querySelector('.smart-search');
-  box?.classList.toggle('local-mode', smartSearchEngine === 'local');
-  if(searchInput) searchInput.placeholder = smartSearchPlaceholders[smartSearchEngine] || '¿Qué querés buscar?';
-}
-searchInput.addEventListener('input', e => filterTiles(e.target.value));
-document.querySelectorAll('.engine-pill').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if(btn.dataset.engine === 'soporte'){ openSupport(); return; }
-    setSmartSearchEngine(btn.dataset.engine);
-    searchInput.focus();
-    if(btn.dataset.engine === 'local') filterTiles(searchInput.value);
+function renderSmartProviderMenus(){
+  document.querySelectorAll('[data-provider-menu]').forEach(menu=>{
+    const category=menu.dataset.providerMenu;
+    const selected=smartProviderSelections[category];
+    menu.innerHTML=(smartSearchProviders[category]||[]).map(provider=>`<button type="button" class="search-provider-option${provider.id===selected?' selected':''}" data-category="${category}" data-provider="${provider.id}" role="menuitem"><img src="${provider.icon}" alt="" aria-hidden="true"><span>${provider.name}</span></button>`).join('');
   });
-});
-smartSearchForm?.addEventListener('submit', e => {
-  e.preventDefault();
-  const q = searchInput.value.trim();
-  if(smartSearchEngine === 'soporte'){ openSupport(); return; }
-  if(smartSearchEngine === 'local'){ filterTiles(q); return; }
-  openSmartUrl(buildSmartSearchUrl(smartSearchEngine, q));
-});
-setSmartSearchEngine('google');
+  document.querySelectorAll('.search-provider-option').forEach(option=>option.addEventListener('click',event=>{event.stopPropagation();smartProviderSelections[option.dataset.category]=option.dataset.provider;smartSearchCategory=option.dataset.category;renderSmartProviderMenus();updateSmartSearchUI();closeSmartProviderMenus();searchInput?.focus();}));
+}
+function setSmartSearchCategory(category,openMenu=false){
+  if(!smartSearchProviders[category]) return;
+  smartSearchCategory=category;
+  updateSmartSearchUI();
+  if(openMenu){const menu=document.querySelector(`[data-provider-menu="${category}"]`);closeSmartProviderMenus(menu?.classList.contains('open')?'':category);}else closeSmartProviderMenus();
+  searchInput?.focus();
+}
+function filterTiles(query){const q=cleanText(query);document.querySelectorAll('.tile,.custom-tile').forEach(el=>el.classList.toggle('hidden-search',!!q&&!cleanText(el.textContent).includes(q)));}
+const smartQuickCommands={gg:['web','google'],google:['web','google'],bing:['web','bing'],yahoo:['web','yahoo'],gpt:['ai','chatgpt'],chatgpt:['ai','chatgpt'],gemini:['ai','gemini'],claude:['ai','claude'],yt:['videos','youtube'],youtube:['videos','youtube'],comprar:['buy'],shop:['buy'],news:['news','google-news'],noticias:['news','google-news'],maps:['maps','google-maps'],mapa:['maps','google-maps']};
+function parseSmartQuickCommand(value){const match=String(value||'').trim().match(/^([a-z0-9]+)(?:\s+|:\s*)(.*)$/i);if(!match) return null;const target=smartQuickCommands[match[1].toLowerCase()];return target?{category:target[0],provider:target[1]||smartProviderSelections[target[0]],query:match[2].trim()}:null;}
+document.querySelectorAll('.search-category').forEach(button=>button.addEventListener('click',event=>{event.stopPropagation();setSmartSearchCategory(button.dataset.category,true);}));
+document.addEventListener('click',()=>closeSmartProviderMenus());
+document.addEventListener('keydown',event=>{if(event.key==='Escape') closeSmartProviderMenus();});
+searchInput?.addEventListener('input',event=>filterTiles(event.target.value));
+smartSearchForm?.addEventListener('submit',event=>{event.preventDefault();let query=searchInput.value.trim();const command=parseSmartQuickCommand(query);if(command){smartSearchCategory=command.category;smartProviderSelections[command.category]=command.provider;query=command.query;renderSmartProviderMenus();updateSmartSearchUI();}const provider=smartProvider();openSmartUrl(query?provider.search(query):provider.home);});
+renderSmartProviderMenus();
+updateSmartSearchUI();
+
+const visualSearchDialog=document.getElementById('visualSearchDialog');
+const visualSearchButton=document.getElementById('visualSearchBtn');
+const closeVisualSearchButton=document.getElementById('closeVisualSearchBtn');
+const visualSearchAllButton=document.getElementById('visualSearchAllBtn');
+const visualSearchNote=document.getElementById('visualSearchNote');
+const visualSearchServices=Object.freeze({google:{name:'Google Lens',url:'https://lens.google/'},bing:{name:'Bing Visual Search',url:'https://www.bing.com/images/'},tineye:{name:'TinEye',url:'https://tineye.com/'},yandex:{name:'Yandex Images',url:'https://yandex.com/images/'}});
+function launchVisualSearch(serviceId){const service=visualSearchServices[serviceId];if(!service) return;openSmartUrl(service.url);if(visualSearchNote) visualSearchNote.textContent=getGlobalMarketingCopy().visual.opened.replace('{service}',service.name);}
+function launchAllVisualSearches(){Object.keys(visualSearchServices).forEach(launchVisualSearch);if(visualSearchNote) visualSearchNote.textContent=getGlobalMarketingCopy().visual.openedAll;}
+visualSearchButton?.addEventListener('click',()=>openDialog(visualSearchDialog));
+closeVisualSearchButton?.addEventListener('click',()=>closeDialog(visualSearchDialog));
+document.querySelectorAll('[data-visual-provider]').forEach(button=>button.addEventListener('click',()=>launchVisualSearch(button.dataset.visualProvider)));
+visualSearchAllButton?.addEventListener('click',launchAllVisualSearches);
 
 function initPlusAbTest(){
   const btn = document.getElementById('plusSalesBtn');
@@ -908,17 +1035,11 @@ function applyGlobalPreset(){
     if(b) b.textContent = ACTIVE_PRESET.labels.currencyTitle;
   }
   const l = ACTIVE_PRESET.labels;
-  const slogan = document.querySelector('.os-slogan'); if(slogan) slogan.textContent = l.slogan;
-  const searchBadge = document.querySelector('.smart-search-badge'); if(searchBadge) searchBadge.textContent = 'Smart OS Browser';
-  if(searchInput) searchInput.placeholder = l.searchPlaceholder;
+  applyGlobalMarketingCopy();
   const sections = l.sections || {};
   Object.entries(sections).forEach(([key,val]) => {
     const panel = document.querySelector(`[data-section="${key}"] h2`);
     if(panel) panel.textContent = val;
-  });
-  document.querySelectorAll('.engine-pill').forEach(btn => {
-    const txt = l.engines && l.engines[btn.dataset.engine];
-    if(txt) btn.textContent = txt;
   });
   const customTitle = document.querySelector('.custom-title'); if(customTitle) customTitle.innerHTML = l.customTitle + ' <span title="Local save">ⓘ</span>';
   const helpB = document.querySelector('.help-card b'); if(helpB) helpB.textContent = l.helpTitle;

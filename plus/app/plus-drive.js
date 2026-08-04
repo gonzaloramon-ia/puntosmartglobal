@@ -13,6 +13,7 @@
   const LS_GROUPS = keys.groups || "ps_groups_state";
   const LS_CONNECTED = keys.connected || "ps_plus_connected";
   const LS_CUSTOM_TILES = keys.custom || "ps_custom_tiles";
+  const LS_ACCOUNT = keys.account || "ps_plus_account";
   const DRIVE_WEB_URL = "https://drive.google.com/drive/my-drive";
 
   let tokenClient = null;
@@ -20,6 +21,7 @@
   let driveFileId = localStorage.getItem(LS_FILE_ID) || "";
   let saveTimer = null;
   let busy = false;
+  let accountInfo = readStoredAccount();
 
   function ready(fn){
     if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", fn);
@@ -31,9 +33,9 @@
   function initPlus(){
     const wasConnected = !!localStorage.getItem(LS_CONNECTED);
     injectUI();
-    localStorage.removeItem(LS_CONNECTED);
     patchCoreSaves();
-    refreshPlusUI(wasConnected ? "Reconectá Drive para continuar sincronizando." : "Plus sin conectar.", wasConnected ? "warn" : "");
+    refreshPlusUI(wasConnected ? "Restaurando conexión con Drive…" : "Plus sin conectar.", wasConnected ? "warn" : "");
+    if(wasConnected && isClientConfigured()) restoreDriveSession();
   }
 
   function injectUI(){
@@ -61,11 +63,16 @@
               <p>Tu escritorio guardado en tu propio Google Drive.</p>
             </div>
           </div>
+          <div class="plus-account" id="plusAccount" hidden>
+            <img id="plusAccountPhoto" alt="" referrerpolicy="no-referrer">
+            <div><b id="plusAccountName">Cuenta de Google</b><small id="plusAccountEmail"></small></div>
+          </div>
           <div class="plus-status" id="plusStatus">Plus sin conectar.</div>
+          <div class="plus-sync-meta"><span id="plusSyncState">Sin conexión</span><span id="plusLastSync">Sin sincronizaciones</span></div>
           <button class="wide-btn primary" id="connectDriveBtn">Entrar con Google Drive</button>
           <div class="plus-actions">
-            <button id="saveDriveBtn">Guardar en Drive</button>
-            <button id="loadDriveBtn">Cargar desde Drive</button>
+            <button id="saveDriveBtn">Sincronizar ahora</button>
+            <button id="loadDriveBtn">Recuperar desde Drive</button>
             <button id="exportConfigBtn">Exportar respaldo</button>
             <button id="importConfigBtn">Importar respaldo</button>
             <button id="openDriveBtn">Abrir mi Google Drive</button>
@@ -195,7 +202,47 @@
   function queueCloudSave(){
     if(!accessToken || !localStorage.getItem(LS_CONNECTED)) return;
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => saveNow().catch(showError), 900);
+    refreshPlusUI("Cambios pendientes de sincronización…","warn");
+    saveTimer = setTimeout(() => saveNow().catch(showError), 700);
+  }
+
+
+  function readStoredAccount(){
+    try{
+      const value = JSON.parse(localStorage.getItem(LS_ACCOUNT) || "null");
+      return value && typeof value === "object" ? value : null;
+    }catch(e){ return null; }
+  }
+
+  async function restoreDriveSession(){
+    try{
+      await requireToken("");
+      localStorage.setItem(LS_CONNECTED,"1");
+      await loadAccountInfo();
+      refreshPlusUI("Drive conectado.","ok");
+    }catch(error){
+      accessToken = null;
+      refreshPlusUI("La sesión de Google necesita reconexión.","warn");
+    }
+  }
+
+  async function loadAccountInfo(){
+    try{
+      const fields = encodeURIComponent("user(displayName,emailAddress,photoLink)");
+      const response = await driveFetch(`https://www.googleapis.com/drive/v3/about?fields=${fields}`);
+      const data = await response.json();
+      if(data && data.user){
+        accountInfo = {
+          name:String(data.user.displayName || "Cuenta de Google").slice(0,120),
+          email:String(data.user.emailAddress || "").slice(0,180),
+          photo:String(data.user.photoLink || "").slice(0,500)
+        };
+        localStorage.setItem(LS_ACCOUNT,JSON.stringify(accountInfo));
+      }
+    }catch(error){
+      console.warn("No se pudo leer la cuenta de Drive.",error);
+    }
+    refreshPlusUI();
   }
 
   async function connectDrive(){
@@ -203,9 +250,19 @@
       refreshPlusUI("Falta configurar GOOGLE_CLIENT_ID en plus-config.js.", "warn");
       return;
     }
-    await requireToken();
-    await loadFromDrive();
+    const changingAccount = !!accessToken && !!localStorage.getItem(LS_CONNECTED);
+    if(changingAccount){
+      accessToken = null;
+      tokenClient = null;
+      driveFileId = "";
+      accountInfo = null;
+      localStorage.removeItem(LS_FILE_ID);
+      localStorage.removeItem(LS_ACCOUNT);
+    }
+    await requireToken(changingAccount ? "select_account" : "consent");
     localStorage.setItem(LS_CONNECTED, "1");
+    await loadAccountInfo();
+    await loadFromDrive();
     refreshPlusUI("Conectado a Drive.", "ok");
   }
 
@@ -213,7 +270,7 @@
     return CLIENT_ID && !CLIENT_ID.includes("PEGAR_CLIENT_ID");
   }
 
-  async function requireToken(){
+  async function requireToken(promptMode){
     if(accessToken) return accessToken;
     if(!isClientConfigured()) throw new Error("Falta GOOGLE_CLIENT_ID en plus-config.js.");
     await waitForGoogle();
@@ -231,7 +288,8 @@
         },
         error_callback: err => reject(new Error((err && err.message) || "No se pudo iniciar sesión con Google."))
       });
-      tokenClient.requestAccessToken({prompt:"consent"});
+      const prompt = typeof promptMode === "string" ? promptMode : (localStorage.getItem(LS_CONNECTED) ? "" : "consent");
+      tokenClient.requestAccessToken({prompt});
     });
   }
 
@@ -261,7 +319,7 @@
     if(res.status === 401 && !retry){
       accessToken = null;
       localStorage.removeItem(LS_CONNECTED);
-      await requireToken();
+      await requireToken("");
       return driveFetch(url,{...requestOptions,__retry:true});
     }
     if(!res.ok){
@@ -348,6 +406,8 @@
     driveFileId = "";
     localStorage.removeItem(LS_CONNECTED);
     localStorage.removeItem(LS_FILE_ID);
+    localStorage.removeItem(LS_ACCOUNT);
+    accountInfo = null;
     refreshPlusUI("Desconectado. La configuración local queda en este dispositivo.", "warn");
   }
 
@@ -377,15 +437,36 @@
   }
 
   function refreshPlusUI(msg="", mode=""){
-    const connected = !!accessToken && !!localStorage.getItem(LS_CONNECTED);
+    const remembered = !!localStorage.getItem(LS_CONNECTED);
+    const connected = !!accessToken && remembered;
     const dot = document.getElementById("plusDot");
     const small = document.getElementById("plusSmall");
     const status = document.getElementById("plusStatus");
-    if(dot){ dot.className = "plus-dot " + (mode || (connected ? "ok" : "")); }
-    if(small){ small.textContent = connected ? "Drive activo" : "Drive"; }
-    if(status){
-      const last = localStorage.getItem(LS_LAST_SYNC);
-      status.textContent = msg || (connected ? `Conectado. Última sync: ${last ? new Date(last).toLocaleString("es-AR") : "sin dato"}` : "Plus sin conectar.");
+    const connect = document.getElementById("connectDriveBtn");
+    const account = document.getElementById("plusAccount");
+    const accountName = document.getElementById("plusAccountName");
+    const accountEmail = document.getElementById("plusAccountEmail");
+    const accountPhoto = document.getElementById("plusAccountPhoto");
+    const syncState = document.getElementById("plusSyncState");
+    const lastSyncLabel = document.getElementById("plusLastSync");
+    const last = localStorage.getItem(LS_LAST_SYNC);
+    if(dot){ dot.className = "plus-dot " + (mode || (connected ? "ok" : remembered ? "warn" : "")); }
+    if(small){ small.textContent = connected ? "Sincronizado" : remembered ? "Reconectar" : "Drive"; }
+    if(connect){ connect.textContent = connected ? "Cambiar cuenta" : remembered ? "Reconectar Google Drive" : "Entrar con Google Drive"; }
+    if(status){ status.textContent = msg || (connected ? "Google Drive conectado." : remembered ? "La sesión necesita reconexión." : "Plus sin conectar."); }
+    if(syncState){
+      syncState.textContent = msg && /Guardando|pendientes|Restaurando|Cargando/i.test(msg) ? msg : connected ? "Sincronización automática activa" : "Sin sincronización";
+      syncState.className = connected ? "is-ok" : remembered ? "is-warn" : "";
+    }
+    if(lastSyncLabel){ lastSyncLabel.textContent = last ? `Última sincronización: ${new Date(last).toLocaleString("es-AR")}` : "Sin sincronizaciones"; }
+    if(account){ account.hidden = !accountInfo; }
+    if(accountInfo){
+      if(accountName) accountName.textContent = accountInfo.name || "Cuenta de Google";
+      if(accountEmail) accountEmail.textContent = accountInfo.email || "";
+      if(accountPhoto){
+        if(accountInfo.photo){ accountPhoto.src = accountInfo.photo; accountPhoto.hidden = false; }
+        else accountPhoto.hidden = true;
+      }
     }
   }
 

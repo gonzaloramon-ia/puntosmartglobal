@@ -662,86 +662,190 @@ function openFolder(key){
 }
 closeFolderBtn.onclick = () => closeDialog(folderDialog);
 
-let smartSearchEngine = 'google';
-const smartSearchDefaults = {
-  google:'https://www.google.com/',
-  chatgpt:'https://chatgpt.com/',
-  videos:'https://www.youtube.com/',
-  comprar:'https://www.mercadolibre.com.ar/',
-  comparar:'https://www.google.com/search?q=comparar+productos',
-  futbol:'https://www.google.com/search?q=futbol+partidos+de+hoy',
-  tramites:'https://www.argentina.gob.ar/',
-  noticias:'https://news.google.com/topstories?hl=es-419&gl=AR&ceid=AR:es-419',
-  lugares:'https://www.google.com/maps',
-  proveedores:'https://www.google.com/search?q=proveedores+mayoristas+argentina',
-  soporte:'https://www.google.com/search?q=soporte+tecnico',
-  trabajo:'https://mail.google.com/',
-  redes:'https://www.google.com/search?q=redes+sociales',
+let smartSearchCategory = 'web';
+const SMART_SEARCH_STORAGE = 'psos_search_providers_v2';
+const SMART_SEARCH_CATEGORY_STORAGE = 'psos_search_category_v2';
+const SMART_ICON_BASE = PRESET_ICON_BASE;
+const smartRemoteIcon = domain => `https://www.google.com/s2/favicons?domain_url=${encodeURIComponent(`https://${domain}`)}&sz=128`;
+const smartProviderIcon = (localFile, domain) => localFile ? `${SMART_ICON_BASE}${localFile}` : smartRemoteIcon(domain);
+const smartSearchProviders = {
+  web: [
+    {id:'google',name:'Google',icon:smartProviderIcon('google-com.png','google.com'),home:'https://www.google.com/',search:q=>`https://www.google.com/search?q=${encodeURIComponent(q)}`,placeholder:'Buscar en Google...'},
+    {id:'bing',name:'Bing',icon:smartProviderIcon('', 'bing.com'),home:'https://www.bing.com/',search:q=>`https://www.bing.com/search?q=${encodeURIComponent(q)}`,placeholder:'Buscar en Bing...'},
+    {id:'yahoo',name:'Yahoo',icon:smartProviderIcon('', 'yahoo.com'),home:'https://search.yahoo.com/',search:q=>`https://search.yahoo.com/search?p=${encodeURIComponent(q)}`,placeholder:'Buscar en Yahoo...'}
+  ],
+  ai: [
+    {id:'chatgpt',name:'ChatGPT',icon:smartProviderIcon('chatgpt-com.png','chatgpt.com'),home:'https://chatgpt.com/',search:q=>`https://chatgpt.com/?q=${encodeURIComponent(q)}`,placeholder:'Preguntarle a ChatGPT...'},
+    {id:'claude',name:'Claude',icon:smartProviderIcon('claude-ai.png','claude.ai'),home:'https://claude.ai/new',search:q=>`https://claude.ai/new?q=${encodeURIComponent(q)}`,placeholder:'Preguntarle a Claude...'},
+    {id:'gemini',name:'Gemini',icon:smartProviderIcon('gemini-google-com.png','gemini.google.com'),home:'https://gemini.google.com/app',search:q=>`https://gemini.google.com/app?prompt=${encodeURIComponent(q)}`,placeholder:'Preguntarle a Gemini...'},
+    {id:'perplexity',name:'Perplexity',icon:smartProviderIcon('', 'perplexity.ai'),home:'https://www.perplexity.ai/',search:q=>`https://www.perplexity.ai/search/new?q=${encodeURIComponent(q)}`,placeholder:'Buscar con Perplexity...'},
+    {id:'meta',name:'Meta AI',icon:smartProviderIcon('', 'meta.ai'),home:'https://www.meta.ai/',search:q=>`https://www.meta.ai/?prompt=${encodeURIComponent(q)}`,placeholder:'Preguntarle a Meta AI...'},
+    {id:'copilot',name:'Copilot',icon:smartProviderIcon('', 'copilot.microsoft.com'),home:'https://copilot.microsoft.com/',search:q=>`https://copilot.microsoft.com/?q=${encodeURIComponent(q)}`,placeholder:'Preguntarle a Copilot...'}
+  ],
+  videos: [
+    {id:'youtube',name:'YouTube',icon:smartProviderIcon('youtube-com.png','youtube.com'),home:'https://www.youtube.com/',search:q=>`https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`,placeholder:'Buscar videos en YouTube...'}
+  ],
+  buy: [
+    {id:'google-shopping',name:'Google',icon:smartProviderIcon('google-com.png','google.com'),home:'https://www.google.com/',search:q=>`https://www.google.com/search?q=${encodeURIComponent(q)}`,placeholder:'Buscar productos en Google...'}
+  ],
+  news: [
+    {id:'google-news',name:'Google Noticias',icon:smartProviderIcon('', 'news.google.com'),home:'https://news.google.com/topstories?hl=es-419&gl=AR&ceid=AR:es-419',search:q=>`https://news.google.com/search?q=${encodeURIComponent(q)}&hl=es-419&gl=AR&ceid=AR:es-419`,placeholder:'Buscar noticias en Google Noticias...'},
+    {id:'infobae',name:'Infobae',icon:smartProviderIcon('infobae-com.png','infobae.com'),home:'https://www.infobae.com/',search:q=>`https://www.google.com/search?q=${encodeURIComponent(`site:infobae.com ${q}`)}`,placeholder:'Buscar noticias en Infobae...'},
+    {id:'clarin',name:'Clarín',icon:smartProviderIcon('clarin-com.png','clarin.com'),home:'https://www.clarin.com/',search:q=>`https://www.google.com/search?q=${encodeURIComponent(`site:clarin.com ${q}`)}`,placeholder:'Buscar noticias en Clarín...'},
+    {id:'pagina12',name:'Página/12',icon:smartProviderIcon('', 'pagina12.com.ar'),home:'https://www.pagina12.com.ar/',search:q=>`https://www.google.com/search?q=${encodeURIComponent(`site:pagina12.com.ar ${q}`)}`,placeholder:'Buscar noticias en Página/12...'},
+    {id:'eldestape',name:'El Destape',icon:smartProviderIcon('', 'eldestapeweb.com'),home:'https://www.eldestapeweb.com/',search:q=>`https://www.google.com/search?q=${encodeURIComponent(`site:eldestapeweb.com ${q}`)}`,placeholder:'Buscar noticias en El Destape...'},
+    {id:'lanacion',name:'La Nación',icon:smartProviderIcon('lanacion-com-ar.png','lanacion.com.ar'),home:'https://www.lanacion.com.ar/',search:q=>`https://www.google.com/search?q=${encodeURIComponent(`site:lanacion.com.ar ${q}`)}`,placeholder:'Buscar noticias en La Nación...'}
+  ],
+  maps: [
+    {id:'google-maps',name:'Google Maps',icon:smartProviderIcon('maps-google-com.png','maps.google.com'),home:'https://www.google.com/maps',search:q=>`https://www.google.com/maps/search/${encodeURIComponent(q)}`,placeholder:'Buscar lugares en Google Maps...'}
+  ]
 };
-const smartSearchPlaceholders = {
-  google:'Buscar en la web...',
-  chatgpt:'Preguntarle a la IA...',
-  videos:'Buscar videos, tutoriales o reviews...',
-  comprar:'Buscar para comprar...',
-  comparar:'Comparar modelos, precios o alternativas...',
-  futbol:'Buscar fútbol, partidos, resultados o tabla...',
-  tramites:'Buscar trámites argentinos...',
-  noticias:'Buscar noticias...',
-  lugares:'Buscar lugares, direcciones o comercios...',
-  proveedores:'Buscar proveedores o mayoristas...',
-  soporte:'Buscar solución técnica...',
-  trabajo:'Buscar en herramientas de trabajo...',
-  redes:'Buscar en redes sociales...'
+const smartCategoryLabels = {web:'Web',ai:'IA',videos:'Videos',buy:'Comprar',news:'Noticias',maps:'Maps'};
+let smartProviderSelections = {};
+try{ smartProviderSelections = JSON.parse(localStorage.getItem(SMART_SEARCH_STORAGE) || '{}') || {}; }catch(e){ smartProviderSelections = {}; }
+Object.entries(smartSearchProviders).forEach(([category,providers])=>{
+  if(!providers.some(p=>p.id===smartProviderSelections[category])) smartProviderSelections[category]=providers[0].id;
+});
+try{
+  const savedCategory = localStorage.getItem(SMART_SEARCH_CATEGORY_STORAGE);
+  if(savedCategory && smartSearchProviders[savedCategory]) smartSearchCategory = savedCategory;
+}catch(e){}
+function smartProvider(category=smartSearchCategory){
+  const providers = smartSearchProviders[category] || smartSearchProviders.web;
+  return providers.find(p=>p.id===smartProviderSelections[category]) || providers[0];
+}
+function closeSmartProviderMenus(except=''){
+  document.querySelectorAll('.search-provider-menu').forEach(menu=>{
+    const shouldStay = except && menu.dataset.providerMenu===except;
+    menu.classList.toggle('open',!!shouldStay);
+  });
+  document.querySelectorAll('.search-category').forEach(btn=>btn.setAttribute('aria-expanded',String(!!except && btn.dataset.category===except)));
+}
+function updateSmartSearchUI(){
+  const provider = smartProvider();
+  document.querySelectorAll('.search-category').forEach(btn=>{
+    const active = btn.dataset.category===smartSearchCategory;
+    btn.classList.toggle('active',active);
+    const icon = btn.querySelector('.search-category-icon');
+    const current = smartProvider(btn.dataset.category);
+    if(icon){ icon.src=current.icon; icon.alt=''; }
+  });
+  if(searchInput) searchInput.placeholder = provider.placeholder;
+  const activeIcon = document.getElementById('activeSearchIcon');
+  const activeName = document.getElementById('activeSearchProvider');
+  if(activeIcon){ activeIcon.src=provider.icon; activeIcon.alt=''; }
+  if(activeName) activeName.textContent=provider.name;
+  try{
+    localStorage.setItem(SMART_SEARCH_STORAGE,JSON.stringify(smartProviderSelections));
+    localStorage.setItem(SMART_SEARCH_CATEGORY_STORAGE,smartSearchCategory);
+  }catch(e){}
+}
+function renderSmartProviderMenus(){
+  document.querySelectorAll('[data-provider-menu]').forEach(menu=>{
+    const category = menu.dataset.providerMenu;
+    const selected = smartProviderSelections[category];
+    menu.innerHTML = (smartSearchProviders[category] || []).map(provider=>`<button type="button" class="search-provider-option${provider.id===selected?' selected':''}" data-category="${category}" data-provider="${provider.id}" role="menuitem"><img src="${provider.icon}" alt="" aria-hidden="true"><span>${provider.name}</span></button>`).join('');
+  });
+  document.querySelectorAll('.search-provider-option').forEach(option=>option.addEventListener('click',event=>{
+    event.stopPropagation();
+    smartProviderSelections[option.dataset.category]=option.dataset.provider;
+    smartSearchCategory=option.dataset.category;
+    renderSmartProviderMenus();
+    updateSmartSearchUI();
+    closeSmartProviderMenus();
+    searchInput?.focus();
+  }));
+}
+function setSmartSearchCategory(category,openMenu=false){
+  if(!smartSearchProviders[category]) return;
+  smartSearchCategory=category;
+  updateSmartSearchUI();
+  if(openMenu){
+    const menu=document.querySelector(`[data-provider-menu="${category}"]`);
+    const open=!(menu?.classList.contains('open'));
+    closeSmartProviderMenus(open?category:'');
+  }else closeSmartProviderMenus();
+  searchInput?.focus();
+}
+const smartQuickCommands = {
+  gg:['web','google'],google:['web','google'],bing:['web','bing'],yahoo:['web','yahoo'],
+  gpt:['ai','chatgpt'],chatgpt:['ai','chatgpt'],claude:['ai','claude'],gemini:['ai','gemini'],pplx:['ai','perplexity'],perplexity:['ai','perplexity'],meta:['ai','meta'],copilot:['ai','copilot'],
+  yt:['videos','youtube'],youtube:['videos','youtube'],comprar:['buy','google-shopping'],shop:['buy','google-shopping'],
+  news:['news','google-news'],noticias:['news','google-news'],infobae:['news','infobae'],clarin:['news','clarin'],pagina12:['news','pagina12'],eldestape:['news','eldestape'],lanacion:['news','lanacion'],
+  maps:['maps','google-maps'],mapa:['maps','google-maps']
 };
-function buildSmartSearchUrl(engine, query){
-  const q = (query || '').trim();
-  if(!q) return smartSearchDefaults[engine] || smartSearchDefaults.google;
-  const e = encodeURIComponent(q);
-  const dash = e.replace(/%20/g,'-');
-  if(engine === 'videos') return `https://www.youtube.com/results?search_query=${e}`;
-  if(engine === 'comprar') return `https://listado.mercadolibre.com.ar/${dash}`;
-  if(engine === 'comparar') return `https://www.google.com/search?q=${encodeURIComponent('comparar ' + q + ' precio características opiniones')}`;
-  if(engine === 'futbol') return `https://www.google.com/search?q=${encodeURIComponent(q + ' futbol partidos resultados fixture tabla')}`;
-  if(engine === 'tramites') return `https://www.google.com/search?q=${encodeURIComponent(q + ' site:argentina.gob.ar OR site:arca.gob.ar OR site:anses.gob.ar OR site:buenosaires.gob.ar')}`;
-  if(engine === 'noticias') return `https://news.google.com/search?q=${e}&hl=es-419&gl=AR&ceid=AR:es-419`;
-  if(engine === 'lugares') return `https://www.google.com/maps/search/${encodeURIComponent(q + ' cerca de mi')}`;
-  if(engine === 'proveedores') return `https://www.google.com/search?q=${encodeURIComponent('proveedor mayorista ' + q + ' argentina')}`;
-  if(engine === 'soporte') return 'https://wa.me/5491148706501?text=Hola%2C%20necesito%20soporte%20con%20Punto%20Smart%20OS';
-  if(engine === 'trabajo') return `https://mail.google.com/mail/u/0/#search/${e}`;
-  if(engine === 'redes') return `https://www.google.com/search?q=${encodeURIComponent(q + ' site:instagram.com OR site:tiktok.com OR site:facebook.com OR site:x.com OR site:linkedin.com')}`;
-  if(engine === 'chatgpt') return `https://chatgpt.com/?q=${e}`;
-  return `https://www.google.com/search?q=${e}`;
+function parseSmartQuickCommand(value){
+  const match=String(value||'').trim().match(/^([a-z0-9]+)(?:\s+|:\s*)(.*)$/i);
+  if(!match) return null;
+  const target=smartQuickCommands[match[1].toLowerCase()];
+  return target?{category:target[0],provider:target[1],query:match[2].trim()}:null;
+}
+function buildSmartSearchUrl(category,providerId,query){
+  const providers=smartSearchProviders[category]||smartSearchProviders.web;
+  const provider=providers.find(p=>p.id===providerId)||providers[0];
+  const q=String(query||'').trim();
+  return q?provider.search(q):provider.home;
 }
 function filterTiles(query){
-  const q = cleanText(query);
-  document.querySelectorAll('.tile,.custom-tile').forEach(el => {
-    const text = cleanText(el.textContent);
-    el.classList.toggle('hidden-search', !!q && !text.includes(q));
+  const q=cleanText(query);
+  document.querySelectorAll('.tile,.custom-tile').forEach(el=>{
+    const text=cleanText(el.textContent);
+    el.classList.toggle('hidden-search',!!q&&!text.includes(q));
   });
 }
-function setSmartSearchEngine(engine){
-  smartSearchEngine = engine || 'google';
-  document.querySelectorAll('.engine-pill').forEach(btn => btn.classList.toggle('active', btn.dataset.engine === smartSearchEngine));
-  const box = document.querySelector('.smart-search');
-  box?.classList.toggle('local-mode', smartSearchEngine === 'local');
-  if(searchInput) searchInput.placeholder = smartSearchPlaceholders[smartSearchEngine] || '¿Qué querés buscar?';
+document.querySelectorAll('.search-category').forEach(btn=>btn.addEventListener('click',event=>{
+  event.stopPropagation();
+  setSmartSearchCategory(btn.dataset.category,true);
+}));
+document.addEventListener('click',()=>closeSmartProviderMenus());
+document.addEventListener('keydown',event=>{ if(event.key==='Escape') closeSmartProviderMenus(); });
+searchInput?.addEventListener('input',event=>filterTiles(event.target.value));
+smartSearchForm?.addEventListener('submit',event=>{
+  event.preventDefault();
+  let q=searchInput.value.trim();
+  const command=parseSmartQuickCommand(q);
+  if(command){
+    smartSearchCategory=command.category;
+    smartProviderSelections[command.category]=command.provider;
+    q=command.query;
+    renderSmartProviderMenus();
+    updateSmartSearchUI();
+  }
+  const provider=smartProvider();
+  openSmartUrl(buildSmartSearchUrl(smartSearchCategory,provider.id,q));
+});
+renderSmartProviderMenus();
+updateSmartSearchUI();
+
+// Los motores reciben la imagen en sus propias interfaces. Sin backend no es seguro
+// ni estable reenviar archivos locales a servicios externos desde Punto Smart OS.
+const visualSearchDialog = document.getElementById('visualSearchDialog');
+const visualSearchButton = document.getElementById('visualSearchBtn');
+const closeVisualSearchButton = document.getElementById('closeVisualSearchBtn');
+const visualSearchAllButton = document.getElementById('visualSearchAllBtn');
+const visualSearchNote = document.getElementById('visualSearchNote');
+const visualSearchServices = Object.freeze({
+  google:{name:'Google Lens',url:'https://lens.google/'},
+  bing:{name:'Bing Visual Search',url:'https://www.bing.com/images/'},
+  tineye:{name:'TinEye',url:'https://tineye.com/'},
+  yandex:{name:'Yandex Images',url:'https://yandex.com/images/'}
+});
+function launchVisualSearch(serviceId){
+  const service = visualSearchServices[serviceId];
+  if(!service) return;
+  openSmartUrl(service.url);
+  if(visualSearchNote) visualSearchNote.textContent = `Se abrió ${service.name}. Subí la imagen directamente allí para iniciar la búsqueda.`;
 }
-searchInput.addEventListener('input', e => filterTiles(e.target.value));
-document.querySelectorAll('.engine-pill').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if(btn.dataset.engine === 'soporte'){ supportBtn.click(); return; }
-    setSmartSearchEngine(btn.dataset.engine);
-    searchInput.focus();
-    if(btn.dataset.engine === 'local') filterTiles(searchInput.value);
-  });
+function launchAllVisualSearches(){
+  Object.keys(visualSearchServices).forEach(serviceId => launchVisualSearch(serviceId));
+  if(visualSearchNote) visualSearchNote.textContent = 'Abrimos los cuatro buscadores. Si el navegador bloqueó alguna pestaña, podés abrirla desde esta lista.';
+}
+visualSearchButton?.addEventListener('click', () => openDialog(visualSearchDialog));
+closeVisualSearchButton?.addEventListener('click', () => closeDialog(visualSearchDialog));
+document.querySelectorAll('[data-visual-provider]').forEach(button => {
+  button.addEventListener('click', () => launchVisualSearch(button.dataset.visualProvider));
 });
-smartSearchForm?.addEventListener('submit', e => {
-  e.preventDefault();
-  const q = searchInput.value.trim();
-  if(smartSearchEngine === 'local'){ filterTiles(q); return; }
-  openSmartUrl(buildSmartSearchUrl(smartSearchEngine, q));
-});
-setSmartSearchEngine('google');
+visualSearchAllButton?.addEventListener('click', launchAllVisualSearches);
 
 function initPlusAbTest(){
   const btn = document.getElementById('plusSalesBtn');
@@ -884,8 +988,8 @@ function psosSetDollar(oficial, blue){
   const oficialEl = document.getElementById('dollarOfficial');
   const blueEl = document.getElementById('dollarBlue');
   if(!widget || !oficialEl || !blueEl) return;
-  oficialEl.textContent = `Oficial $${psosFormatArs(oficial.venta)}`;
-  blueEl.textContent = `Blue $${psosFormatArs(blue.venta)} · DolarAPI`;
+  blueEl.textContent = `Blue $${psosFormatArs(blue.venta)}`;
+  oficialEl.textContent = `Oficial $${psosFormatArs(oficial.venta)} · DolarAPI`;
   const updated = new Date(blue.fechaActualizacion || oficial.fechaActualizacion || Date.now());
   widget.title = `Oficial: compra $${psosFormatArs(oficial.compra)} / venta $${psosFormatArs(oficial.venta)}. Blue: compra $${psosFormatArs(blue.compra)} / venta $${psosFormatArs(blue.venta)}. Actualizado ${updated.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}. Tocá para actualizar.`;
   widget.classList.remove('is-loading','is-error');

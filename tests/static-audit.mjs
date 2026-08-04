@@ -57,7 +57,8 @@ assert.match(core,/function remoteFavicon\(/);
 assert.match(global,/function remoteFavicon\(/);
 assert(!/domain=\$\{encodeURIComponent/.test(core+global),'No debe volver la variante rota del servicio de favicons.');
 assert(!/technical\+support/.test(global),'Soporte no debe volver a dirigir a una búsqueda de Google.');
-assert.match(global,/btn\.dataset\.engine === 'soporte'/);
+assert.match(global,/supportBtn\.onclick\s*=/);
+assert.match(global,/const smartSearchProviders=buildGlobalSmartSearchProviders\(\)/);
 assert(!/supportBtn\.onclick\s*=.*mailto:|suggestBtn\.onclick\s*=.*mailto:/.test(global),'Soporte y sugerencias deben abrir el contacto interno.');
 assert.match(global,/function openContact\(/);
 assert.match(drive,/puntosmart-config-\$\{COUNTRY\.toLowerCase\(\)\}-v2\.json/);
@@ -95,7 +96,28 @@ for(const file of ['index.html','plus/app/index.html','global/index.html','globa
   assert.match(html,/rel="manifest"/,`${file} necesita manifest de instalación.`);
   assert.match(html,/data-install-app/,`${file} necesita un botón para instalar la app.`);
   assert.match(html,/install\.js/,`${file} necesita el flujo de instalación.`);
-  assert.match(html,/↺\s*<span class="reset-label">Restaurar<\/span>/,`${file} necesita un control Restaurar claro.`);
+  if(['index.html','plus/app/index.html'].includes(file)){
+    assert.doesNotMatch(html,/id="resetBtn"/,`${file} no debe mostrar Restaurar en el header.`);
+  }else{
+    assert.match(html,/↺\s*<span class="reset-label">Restaurar<\/span>/,`${file} necesita un control Restaurar claro.`);
+  }
 }
+
+for(const file of ['index.html','plus/app/index.html','global/index.html','global-plus/index.html']){
+  const html=await readFile(path.join(root,file),'utf8');
+  assert.match(html,/El primer Sistema Operativo que te acompaña a todos lados\./);
+  assert.match(html,/Más rápido, más liviano y sin instalar apps\./);
+  assert.match(html,/Usalo desde cualquier dispositivo, sin ocupar espacio\./);
+  assert.match(html,/No recopilamos tu información personal\./);
+  assert.match(html,/id="visualSearchBtn"/);
+  assert.match(html,/id="visualSearchAllBtn"/);
+  assert.equal((html.match(/data-visual-provider=/g)||[]).length,4,`${file} debe incluir los cuatro motores de búsqueda visual.`);
+}
+assert.match(core,/const visualSearchServices = Object\.freeze/);
+assert.match(global,/const visualSearchServices=Object\.freeze/);
+assert.match(core,/google:\{name:'Google Lens'/);
+assert.match(core,/bing:\{name:'Bing Visual Search'/);
+assert.match(core,/tineye:\{name:'TinEye'/);
+assert.match(core,/yandex:\{name:'Yandex Images'/);
 
 console.log(`OK: ${jsFiles.length} scripts, ${htmlFiles.length} HTML y enlaces locales validados.`);

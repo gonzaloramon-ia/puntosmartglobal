@@ -96,6 +96,25 @@ test('La instalación como app queda visible y ofrece instrucciones de respaldo'
   dom.window.close();
 });
 
+test('La búsqueda visual concentra los cuatro motores sin procesar la imagen en Punto Smart OS',async()=>{
+  const {dom,errors}=await loadPage('/index.html');
+  const {document}=dom.window;
+  document.getElementById('visualSearchBtn').click();
+  const dialog=document.getElementById('visualSearchDialog');
+  assert.equal(errors.length,0,errors.map(error=>error.message).join('\n'));
+  assert(dialog.open,'El selector de búsqueda visual debe abrirse desde la barra.');
+  assert.equal(document.querySelectorAll('[data-visual-provider]').length,4);
+  assert.match(dialog.textContent,/Google Lens/);
+  assert.match(dialog.textContent,/Bing Visual Search/);
+  assert.match(dialog.textContent,/TinEye/);
+  assert.match(dialog.textContent,/Yandex Images/);
+  assert.match(dialog.textContent,/Punto Smart OS no la guarda ni la procesa/);
+  assert(document.getElementById('visualSearchAllBtn'));
+  document.getElementById('closeVisualSearchBtn').click();
+  assert.equal(dialog.open,false);
+  dom.window.close();
+});
+
 test('Una configuración legacy migra al esquema actual sin bloquear nuevos defaults',async()=>{
   const legacy={favorites:[{id:'google',name:'Google',url:'https://www.google.com/',domain:'google.com'}]};
   const {dom}=await loadPage('/index.html',window=>window.localStorage.setItem('ps_groups_state',JSON.stringify(legacy)));
@@ -106,18 +125,15 @@ test('Una configuración legacy migra al esquema actual sin bloquear nuevos defa
   dom.window.close();
 });
 
-test('Plus exige reconexión tras recargar y el reset cancelado conserva los datos',async()=>{
+test('Plus exige reconexión tras recargar y mantiene las herramientas de respaldo',async()=>{
   const {dom}=await loadPage('/plus/app/index.html',window=>{
     window.localStorage.setItem('ps_plus_connected','1');
-    window.confirm=()=>false;
   });
-  const {document,localStorage}=dom.window;
-  assert.equal(document.getElementById('plusSmall').textContent,'Drive');
-  assert.match(document.getElementById('plusStatus').textContent,/Reconectá/);
+  const {document}=dom.window;
+  assert.equal(document.getElementById('plusSmall').textContent,'Reconectar');
+  assert.match(document.getElementById('plusStatus').textContent,/Reconectá|Restaurando conexión/);
   assert(document.getElementById('exportConfigBtn'));
-  localStorage.setItem('ps_groups_state','dato-que-no-debe-borrarse');
-  document.getElementById('resetBtn').click();
-  assert.equal(localStorage.getItem('ps_groups_state'),'dato-que-no-debe-borrarse');
+  assert.equal(document.getElementById('resetBtn'),null);
   dom.window.close();
 });
 
@@ -134,7 +150,8 @@ for(const country of ['BR','FR']){
     assert.match(document.querySelector('#favoritesGrid .tile img').src,/\/assets\/icons\//);
     assert.equal(document.querySelectorAll('.tile img[src*="google.com/s2/favicons"]').length,0);
     assert.match(document.getElementById('resetBtn').textContent,/↺/);
-    document.querySelector('.engine-pill[data-engine="soporte"]').click();
+    assert.equal(document.querySelectorAll('.search-category').length,6,'La búsqueda debe usar las seis categorías de Argentina.');
+    document.getElementById('supportBtn').click();
     assert(document.getElementById('contactDialog').open,'Soporte debe abrir el contacto interno.');
     document.getElementById('dismissContactBtn').click();
     document.getElementById('suggestBtn').click();

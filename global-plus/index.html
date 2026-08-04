@@ -24,6 +24,7 @@
   <link rel="stylesheet" href="smartos-extra.css?v=180" />
   <link rel="stylesheet" href="../reliability.css?v=5" />
   <link rel="stylesheet" href="plus.css?v=99" />
+  <link rel="stylesheet" href="../v2.css?v=4" />
 <!-- Punto Smart OS - desarrollo original de Punto Smart - Punto Smart marca registrada ante INPI --></head>
 <body>
   <div class="app-shell">
@@ -56,31 +57,33 @@
     </header>
 
     <main>
-      <h1 class="os-slogan">Interfaz Híbrida Operativa. Entorno Adaptable a tu gusto.</h1>
-
-      <section class="smart-search" aria-label="Smart OS Browser">
-        <div class="smart-search-head">
-          <span class="smart-search-badge">Smart OS Browser</span>
+      <section class="benefits-v2" aria-label="Beneficios de Punto Smart OS">
+        <h1 class="benefit-lead"><span aria-hidden="true">🌍</span><span id="benefitLeadText" class="benefit-lead-text">El primer Sistema Operativo que te acompaña a todos lados.</span></h1>
+        <div class="benefit-copy">
+          <p class="benefit-item"><span aria-hidden="true">⚡</span><b id="benefitSpeedText">Más rápido, más liviano y sin instalar apps.</b></p>
+          <p class="benefit-item"><span aria-hidden="true">📱</span><b id="benefitDevicesText">Usalo desde cualquier dispositivo, sin ocupar espacio.</b></p>
         </div>
+        <div class="benefit-privacy"><span aria-hidden="true">🔒</span><b id="benefitPrivacyText">No recopilamos tu información personal. <span class="benefit-check" aria-hidden="true">✓</span></b></div>
+      </section>
+
+      <section class="smart-search smart-search-v2" aria-label="Smart OS Browser">
         <form id="smartSearchForm" class="smart-search-box">
-          <span class="smart-search-icon">⌕</span>
-          <input id="searchInput" type="search" autocomplete="off" placeholder="¿Qué querés buscar?" />
+          <span class="smart-search-brand" aria-label="Smart OS Browser"><span class="smart-search-brand-symbol" aria-hidden="true">✦</span><span class="smart-search-brand-text">Smart OS <span class="smart-search-brand-browser">Browser</span></span></span>
+          <span class="smart-search-divider" aria-hidden="true"></span>
+          <img id="activeSearchIcon" class="smart-search-provider-icon" src="../assets/icons/google-com.png" alt="" aria-hidden="true" />
+          <input id="searchInput" type="search" autocomplete="off" placeholder="Buscar en Google..." aria-label="Buscar" />
+          <button id="visualSearchBtn" class="smart-search-visual" type="button" title="Buscar por imagen" aria-label="Buscar por imagen" aria-haspopup="dialog" aria-controls="visualSearchDialog">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.8 7.6h3.1l1.2-1.9h5.8l1.2 1.9h3.1c.9 0 1.7.8 1.7 1.7v7.3c0 .9-.8 1.7-1.7 1.7H4.8c-.9 0-1.7-.8-1.7-1.7V9.3c0-.9.8-1.7 1.7-1.7Z"/><circle cx="12" cy="13" r="3.3"/><path class="visual-spark" d="M18.8 2.8v2.7m1.35-1.35h-2.7"/></svg>
+          </button>
           <button id="smartSearchGo" class="smart-search-go" type="submit">Buscar</button>
         </form>
-        <div class="smart-engines" role="group" aria-label="Dónde buscar">
-          <button type="button" class="engine-pill active" data-engine="google">Web</button>
-          <button type="button" class="engine-pill" data-engine="chatgpt">IA</button>
-          <button type="button" class="engine-pill" data-engine="videos">Videos</button>
-          <button type="button" class="engine-pill" data-engine="comprar">Comprar</button>
-          <button type="button" class="engine-pill" data-engine="comparar">Comparar</button>
-          <button type="button" class="engine-pill" data-engine="futbol">Fútbol</button>
-          <button type="button" class="engine-pill" data-engine="tramites">Trámites</button>
-          <button type="button" class="engine-pill" data-engine="noticias">Noticias</button>
-          <button type="button" class="engine-pill" data-engine="lugares">Lugares</button>
-          <button type="button" class="engine-pill" data-engine="proveedores">Proveedores</button>
-          <button type="button" class="engine-pill" data-engine="soporte">Soporte</button>
-          <button type="button" class="engine-pill" data-engine="trabajo">Trabajo</button>
-          <button type="button" class="engine-pill" data-engine="redes">Redes</button>
+        <div class="search-categories" id="searchCategories" role="group" aria-label="Dónde buscar">
+          <div class="search-category-wrap" data-category-wrap="web"><button type="button" class="search-category active" data-category="web" aria-haspopup="menu" aria-expanded="false"><img class="search-category-icon" alt="" aria-hidden="true" /><span>Web</span><span class="search-caret">▼</span></button><div class="search-provider-menu" data-provider-menu="web" role="menu"></div></div>
+          <div class="search-category-wrap" data-category-wrap="ai"><button type="button" class="search-category" data-category="ai" aria-haspopup="menu" aria-expanded="false"><img class="search-category-icon" alt="" aria-hidden="true" /><span>IA</span><span class="search-caret">▼</span></button><div class="search-provider-menu" data-provider-menu="ai" role="menu"></div></div>
+          <div class="search-category-wrap" data-category-wrap="videos"><button type="button" class="search-category" data-category="videos" aria-haspopup="menu" aria-expanded="false"><img class="search-category-icon" alt="" aria-hidden="true" /><span>Videos</span><span class="search-caret">▼</span></button><div class="search-provider-menu" data-provider-menu="videos" role="menu"></div></div>
+          <div class="search-category-wrap" data-category-wrap="buy"><button type="button" class="search-category" data-category="buy" aria-haspopup="menu" aria-expanded="false"><img class="search-category-icon" alt="" aria-hidden="true" /><span>Comprar</span><span class="search-caret">▼</span></button><div class="search-provider-menu" data-provider-menu="buy" role="menu"></div></div>
+          <div class="search-category-wrap" data-category-wrap="news"><button type="button" class="search-category" data-category="news" aria-haspopup="menu" aria-expanded="false"><img class="search-category-icon" alt="" aria-hidden="true" /><span>Noticias</span><span class="search-caret">▼</span></button><div class="search-provider-menu" data-provider-menu="news" role="menu"></div></div>
+          <div class="search-category-wrap" data-category-wrap="maps"><button type="button" class="search-category" data-category="maps" aria-haspopup="menu" aria-expanded="false"><img class="search-category-icon" alt="" aria-hidden="true" /><span>Maps</span><span class="search-caret">▼</span></button><div class="search-provider-menu" data-provider-menu="maps" role="menu"></div></div>
         </div>
       </section>
       <section class="panel wide" data-section="Favoritos y Esenciales">
@@ -223,8 +226,23 @@
     </div>
   </dialog>
 
+  <dialog id="visualSearchDialog" class="modal visual-search-dialog" aria-labelledby="visualSearchTitle">
+    <div class="visual-search-content">
+      <button class="modal-close" id="closeVisualSearchBtn" type="button" aria-label="Cerrar búsqueda por imagen">×</button>
+      <div class="visual-search-heading"><span aria-hidden="true">⌕</span><div><h3 id="visualSearchTitle">Buscar por imagen</h3><p id="visualSearchIntro">Usá una foto, captura o cámara para encontrar coincidencias, productos e información visual.</p></div></div>
+      <div class="visual-search-options" role="group" aria-label="Elegí un buscador visual">
+        <button type="button" class="visual-provider" data-visual-provider="google"><span class="visual-provider-name">Google Lens</span><small data-visual-detail="google">Identificar y encontrar productos</small></button>
+        <button type="button" class="visual-provider" data-visual-provider="bing"><span class="visual-provider-name">Bing Visual Search</span><small data-visual-detail="bing">Similares, texto y objetos</small></button>
+        <button type="button" class="visual-provider" data-visual-provider="tineye"><span class="visual-provider-name">TinEye</span><small data-visual-detail="tineye">Rastrear copias de una imagen</small></button>
+        <button type="button" class="visual-provider" data-visual-provider="yandex"><span class="visual-provider-name">Yandex Images</span><small data-visual-detail="yandex">Coincidencias y objetos similares</small></button>
+      </div>
+      <button type="button" class="visual-search-all" id="visualSearchAllBtn">⌘ Buscar en todos</button>
+      <p class="visual-search-note" id="visualSearchNote">La imagen se sube directamente al buscador que elijas. Punto Smart OS no la guarda ni la procesa.</p>
+    </div>
+  </dialog>
+
   <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden />
-  <script src="script.js?v=202"></script>
+  <script src="script.js?v=203"></script>
   <script src="../install.js?v=1"></script>
   <script src="https://accounts.google.com/gsi/client"></script>
   <script src="plus-config.js?v=97"></script>
