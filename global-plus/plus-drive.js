@@ -31,9 +31,9 @@
   function initPlus(){
     const wasConnected = !!localStorage.getItem(LS_CONNECTED);
     injectUI();
-    localStorage.removeItem(LS_CONNECTED);
     patchCoreSaves();
     refreshPlusUI(wasConnected ? "Reconectá Drive para continuar sincronizando." : "Plus sin conectar.", wasConnected ? "warn" : "");
+    if(wasConnected && isClientConfigured()) restoreDriveSession();
   }
 
   function injectUI(){
@@ -203,17 +203,29 @@
       refreshPlusUI("Falta configurar GOOGLE_CLIENT_ID en plus-config.js.", "warn");
       return;
     }
-    await requireToken();
+    await requireToken("consent");
     await loadFromDrive();
     localStorage.setItem(LS_CONNECTED, "1");
     refreshPlusUI("Conectado a Drive.", "ok");
+  }
+
+  async function restoreDriveSession(){
+    try{
+      await requireToken("");
+      localStorage.setItem(LS_CONNECTED, "1");
+      await loadFromDrive();
+      refreshPlusUI("Drive conectado.", "ok");
+    }catch(error){
+      accessToken = null;
+      refreshPlusUI("La sesión de Google necesita reconexión.", "warn");
+    }
   }
 
   function isClientConfigured(){
     return CLIENT_ID && !CLIENT_ID.includes("PEGAR_CLIENT_ID");
   }
 
-  async function requireToken(){
+  async function requireToken(promptMode){
     if(accessToken) return accessToken;
     if(!isClientConfigured()) throw new Error("Falta GOOGLE_CLIENT_ID en plus-config.js.");
     await waitForGoogle();
@@ -231,7 +243,8 @@
         },
         error_callback: err => reject(new Error((err && err.message) || "No se pudo iniciar sesión con Google."))
       });
-      tokenClient.requestAccessToken({prompt:"consent"});
+      const prompt = typeof promptMode === "string" ? promptMode : (localStorage.getItem(LS_CONNECTED) ? "" : "consent");
+      tokenClient.requestAccessToken({prompt});
     });
   }
 
