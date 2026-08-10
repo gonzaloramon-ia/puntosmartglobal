@@ -13,13 +13,11 @@
   const LS_GROUPS = keys.groups || "ps_groups_state";
   const LS_CONNECTED = keys.connected || "ps_plus_connected";
   const LS_CUSTOM_TILES = keys.custom || "ps_custom_tiles";
-  const LS_ACCOUNT = keys.account || "ps_plus_account";
   const DRIVE_WEB_URL = "https://drive.google.com/drive/my-drive";
 
   let tokenClient = null;
   let accessToken = null;
   let driveFileId = localStorage.getItem(LS_FILE_ID) || "";
-  let accountEmail = localStorage.getItem(LS_ACCOUNT) || "";
   let saveTimer = null;
   let busy = false;
 
@@ -33,9 +31,9 @@
   function initPlus(){
     const wasConnected = !!localStorage.getItem(LS_CONNECTED);
     injectUI();
+    localStorage.removeItem(LS_CONNECTED);
     patchCoreSaves();
     refreshPlusUI(wasConnected ? "Reconectá Drive para continuar sincronizando." : "Plus sin conectar.", wasConnected ? "warn" : "");
-    if(wasConnected && isClientConfigured()) restoreDriveSession();
   }
 
   function injectUI(){
@@ -205,31 +203,17 @@
       refreshPlusUI("Falta configurar GOOGLE_CLIENT_ID en plus-config.js.", "warn");
       return;
     }
-    await requireToken("consent");
-    await loadAccountInfo();
+    await requireToken();
     await loadFromDrive();
     localStorage.setItem(LS_CONNECTED, "1");
     refreshPlusUI("Conectado a Drive.", "ok");
-  }
-
-  async function restoreDriveSession(){
-    try{
-      await requireToken("none");
-      localStorage.setItem(LS_CONNECTED, "1");
-      await loadAccountInfo();
-      await loadFromDrive();
-      refreshPlusUI("Drive conectado.", "ok");
-    }catch(error){
-      accessToken = null;
-      refreshPlusUI("La sesión de Google necesita reconexión.", "warn");
-    }
   }
 
   function isClientConfigured(){
     return CLIENT_ID && !CLIENT_ID.includes("PEGAR_CLIENT_ID");
   }
 
-  async function requireToken(promptMode){
+  async function requireToken(){
     if(accessToken) return accessToken;
     if(!isClientConfigured()) throw new Error("Falta GOOGLE_CLIENT_ID en plus-config.js.");
     await waitForGoogle();
@@ -247,21 +231,8 @@
         },
         error_callback: err => reject(new Error((err && err.message) || "No se pudo iniciar sesión con Google."))
       });
-      const prompt = typeof promptMode === "string" ? promptMode : (localStorage.getItem(LS_CONNECTED) ? "" : "consent");
-      const options = {prompt};
-      if(accountEmail) options.hint = accountEmail;
-      tokenClient.requestAccessToken(options);
+      tokenClient.requestAccessToken({prompt:"consent"});
     });
-  }
-
-  async function loadAccountInfo(){
-    try{
-      const fields = encodeURIComponent("user(emailAddress)");
-      const response = await driveFetch(`https://www.googleapis.com/drive/v3/about?fields=${fields}`);
-      const data = await response.json();
-      const email = String(data?.user?.emailAddress || "").trim();
-      if(email){ accountEmail = email; localStorage.setItem(LS_ACCOUNT, email); }
-    }catch(error){ console.warn("No se pudo guardar la cuenta de Drive.", error); }
   }
 
   function waitForGoogle(){
@@ -377,8 +348,6 @@
     driveFileId = "";
     localStorage.removeItem(LS_CONNECTED);
     localStorage.removeItem(LS_FILE_ID);
-    localStorage.removeItem(LS_ACCOUNT);
-    accountEmail = "";
     refreshPlusUI("Desconectado. La configuración local queda en este dispositivo.", "warn");
   }
 

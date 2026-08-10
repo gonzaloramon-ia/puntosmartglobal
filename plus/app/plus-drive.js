@@ -216,7 +216,7 @@
 
   async function restoreDriveSession(){
     try{
-      await requireToken("none");
+      await requireToken("");
       localStorage.setItem(LS_CONNECTED,"1");
       await loadAccountInfo();
       refreshPlusUI("Drive conectado.","ok");
@@ -289,9 +289,7 @@
         error_callback: err => reject(new Error((err && err.message) || "No se pudo iniciar sesión con Google."))
       });
       const prompt = typeof promptMode === "string" ? promptMode : (localStorage.getItem(LS_CONNECTED) ? "" : "consent");
-      const options = {prompt};
-      if(accountInfo?.email) options.hint = accountInfo.email;
-      tokenClient.requestAccessToken(options);
+      tokenClient.requestAccessToken({prompt});
     });
   }
 
